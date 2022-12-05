@@ -1,8 +1,8 @@
 {
-  "name": "infoparquet",
+  "name": "pan",
   "version": "1.0.0",
   "main": "src/main/frontend/index.js",
-  "author": "Sylvain Mahé <sylvain.mahe@beta.gouv.fr>",
+  "author": "Sylvain Mahé <sylv.mahe@gmail.com>",
   "license": "MIT",
   "scripts": {
     "esbuild-watch": "node esbuild.config.mjs --watch",
