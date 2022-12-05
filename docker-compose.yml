@@ -1,0 +1,49 @@
+version: "3.3"
+services:
+  esbuild:
+    image: node:14-alpine
+    working_dir: /infoparquet
+    tty: true #esbuild --watch does not work if stdin is closed
+    user: "1000:1000"
+    command: sh -c "npm install --no-bin-links && npm run esbuild-watch"
+    volumes:
+      - .:/infoparquet
+  front:
+    image: nginx:1.23-alpine
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "./nginx-selfsigned.crt:/nginx-selfsigned.crt"
+      - "./nginx-selfsigned.key:/nginx-selfsigned.key"
+    ports:
+      - "8443:8443"
+  web:
+    image: maven:3-openjdk-11
+    working_dir: /infoparquet
+    command: mvn -Duser.home=/maven spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:9899"
+    user: 1000:1000
+    volumes:
+      - .:/infoparquet
+      - ./maven:/maven
+    environment:
+      MAVEN_CONFIG: /maven/.m2
+      SPRING_PROFILES_ACTIVE: local
+      TZ: Europe/Paris
+    ports:
+      - "8080"
+      #- "8080:8080"
+      #- "8081:8081"
+      #- "9899:9899"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  db:
+    image: postgres
+    volumes:
+      - data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      TERM: xterm
+    ports:
+      - "54320:5432"
+    
+volumes:
+    data:
