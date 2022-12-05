@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import fr.ffcam.pan.models.boulders.Boulder;
 import fr.ffcam.pan.models.boulders.BoulderRepository;
+import fr.ffcam.pan.models.boulders.ShowBoulderHelper;
 
 @Controller
 public class BoulderController {
@@ -32,7 +33,11 @@ public class BoulderController {
 	public String show(@PathVariable("id") UUID id, Model model) {
 		Boulder b = boulderRepository.findById(id).orElseThrow();
 		
+		var bbox = ShowBoulderHelper.getBoulderBoundingBox(b);
+		
 		model.addAttribute("boulder", b);
+		model.addAttribute("bbox", bbox);
+		
 		
 		return "boulders/show";
 	}

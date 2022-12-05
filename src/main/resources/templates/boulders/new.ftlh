@@ -15,8 +15,8 @@
 			</#list>
 		</select>
 		<svg 
-			viewBox="0 0 160 100"
-			style="width: 100%; aspect-ratio: 16/10; user-select: none;">
+			viewBox="0 0 160 90"
+			style="width: 100%; aspect-ratio: 16/9; user-select: none;">
 			<defs>
 				<g id="hold">
 					<circle x=0 y=0 r=1 fill=none stroke-width=0.1 stroke=red></circle>
@@ -32,14 +32,14 @@
 					x="0"
 					y="0"
 					width="160"
-					height="100"
+					height="90"
 				/>
 				<image
 					xlink:href="/img/pan_web.jpg"
 					x="0"
 					y="0"
 					width="160"
-					height="100"
+					height="90"
 					clip-path="url(#holdsClipPath)"
 				/>
 			</g>
