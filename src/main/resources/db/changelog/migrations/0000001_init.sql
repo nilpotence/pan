@@ -20,7 +20,7 @@ SET row_security = off;
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA pan;
 
 
 --
@@ -35,10 +35,10 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: boulder; Type: TABLE; Schema: public; Owner: postgres
+-- Name: boulder; Type: TABLE; Schema: pan; Owner: postgres
 --
 
-CREATE TABLE public.boulder (
+CREATE TABLE pan.boulder (
     id uuid NOT NULL,
     name character varying(255),
     estimated_grade character varying(255),
@@ -46,13 +46,13 @@ CREATE TABLE public.boulder (
 );
 
 
-ALTER TABLE public.boulder OWNER TO postgres;
+ALTER TABLE pan.boulder OWNER TO postgres;
 
 --
--- Name: boulder boulder_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: boulder boulder_pkey; Type: CONSTRAINT; Schema: pan; Owner: postgres
 --
 
-ALTER TABLE ONLY public.boulder
+ALTER TABLE ONLY pan.boulder
     ADD CONSTRAINT boulder_pkey PRIMARY KEY (id);
 
 --
