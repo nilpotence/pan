@@ -38,5 +38,5 @@ jobs:
         port: ${{ secrets.PORT }}
         privateKey: ${{ secrets.SSHKEY }}
         localDir: "target/"
-        target: "/app/"
+        remoteDir: "/app/"
         exclude: '!*.jar'
