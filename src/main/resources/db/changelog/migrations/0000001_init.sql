@@ -32,7 +32,7 @@ CREATE TABLE pan.boulder (
 );
 
 
-ALTER TABLE pan.boulder OWNER TO postgres;
+ALTER TABLE pan.boulder OWNER TO pan;
 
 --
 -- Name: boulder boulder_pkey; Type: CONSTRAINT; Schema: pan; Owner: postgres
