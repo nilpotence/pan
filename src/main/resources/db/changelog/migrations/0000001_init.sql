@@ -16,17 +16,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
---
-
---
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
