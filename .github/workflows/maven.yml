@@ -33,10 +33,11 @@ jobs:
     - name: deploy to VPS
       uses: wangyucode/sftp-upload-action@v1.4.8
       with:
+        dryRun: false
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         port: ${{ secrets.PORT }}
         privateKey: ${{ secrets.SSHKEY }}
         localDir: "target/"
         remoteDir: "/app/"
-        exclude: '!*.jar'
+        exclude: '!target/*.jar'
