@@ -1,3 +1,3 @@
 databaseChangeLog:
   - include:
-      file: classpath*:db/changelog/migrations/000001_init.sql
+      file: classpath*:db/changelog/migrations/0000001_init.sql
