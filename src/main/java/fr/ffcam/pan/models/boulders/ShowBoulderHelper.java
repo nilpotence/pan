@@ -2,6 +2,8 @@ package fr.ffcam.pan.models.boulders;
 
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
@@ -11,8 +13,7 @@ public class ShowBoulderHelper {
 	
 	public static BoulderBoundingBox getBoulderBoundingBox(Boulder b) {
 		try {
-			var mapper = new ObjectMapper();
-			Hold[] holds = mapper.readValue(b.getHolds(), Hold[].class);
+			var holds = parseHolds(b.getHolds());
 			
 			double minX = Double.MAX_VALUE;
 			double maxX = - Double.MAX_VALUE;
@@ -40,6 +41,11 @@ public class ShowBoulderHelper {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static Hold[] parseHolds(String holds) throws JsonMappingException, JsonProcessingException {
+		var mapper = new ObjectMapper();
+		return mapper.readValue(holds, Hold[].class);
 	}
 	
 	@Data

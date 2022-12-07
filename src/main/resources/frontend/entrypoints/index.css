@@ -1,0 +1,21 @@
+.pan-input {
+	margin-bottom: var(--spacing);
+}
+
+.pan-input input, .pan-input select {
+	margin-bottom: 0;
+}
+
+.pan-input .pan-input--errors {
+	font-size: 0.8em;
+	color: var(--form-element-invalid-border-color);
+}
+
+.pan-input svg {
+	border-radius: var(--border-radius);
+	border: 1px solid var(--form-element-border-color);
+}
+
+.pan-input svg[aria-invalid=true] {
+	border: 1px solid var(--form-element-invalid-border-color);
+}

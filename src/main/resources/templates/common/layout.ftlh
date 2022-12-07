@@ -15,8 +15,8 @@
 				  <li><strong>Pan</strong></li>
 			  </ul>
 			  <ul>
-				  <li><a href="/boulders">Les blocs</a></li>
-				  <li><a href="/boulders/new">Créer</a></li>
+				  <li><a href="<@spring.url '/boulders' />">Les blocs</a></li>
+				  <li><a href="<@spring.url '/boulders/new' />">Créer</a></li>
 			  </ul>
 		  </nav>
     	<#nested />

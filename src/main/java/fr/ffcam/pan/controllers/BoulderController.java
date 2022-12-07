@@ -3,10 +3,14 @@ package fr.ffcam.pan.controllers;
 import java.util.List;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -43,17 +47,24 @@ public class BoulderController {
 	}
 	
 	@GetMapping("/boulders/new")
-	public String createForm() {
+	public String createForm(Model model) {
+		model.addAttribute("boulder", new Boulder());
 		return "boulders/new";
 	}
 	
 	@PostMapping("/boulders/new")
-	public String create(String name, String estimatedGrade, String holds) {
+	public String create(
+			@ModelAttribute("boulder") @Valid Boulder boulder,
+			BindingResult bindingResult) {
 		
-		Boulder boulder = new Boulder();
-		boulder.setName(name);
-		boulder.setEstimatedGrade(estimatedGrade);
-		boulder.setHolds(holds);
+		if (bindingResult.hasErrors()) {
+			System.out.println("errors");
+			for (var e : bindingResult.getAllErrors()) {
+				System.out.println(e);
+			}
+			System.out.println(boulder.getEstimatedGrade());
+			return "boulders/new";
+		}
 		
 		boulderRepository.save(boulder);
 		

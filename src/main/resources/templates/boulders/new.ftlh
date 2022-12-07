@@ -1,22 +1,25 @@
+<#import "/common/form.ftlh" as f>
+
 <@layout.main title="Créer un nouveau bloc">
 	<h1>Créer un nouveau bloc</h1>
-	<form action="/boulders/new" method="POST">
-		<label for="boulderName">
-			<input type="text" id="boulderName" name="name" placeholder="Nom du bloc" required />
-		</label>
-		<select name="estimatedGrade">
-			<option value="" disabled selected>Cotation estimée</option>
-			<#list 3..8 as gradeNum>
-				<#list ['a', 'b', 'c'] as gradeLetter>
-					<#list ['', '+'] as gradeSign>
-						<option value="${gradeNum}${gradeLetter}${gradeSign}">${gradeNum}${gradeLetter}${gradeSign}</option>
-					</#list>
+	<form action="<@spring.url '/boulders/new' />" method="POST">
+		<@f.input path="boulder.name" label="" type="text" placeholder="Nom du bloc" /> 
+		<#assign grades = [] />
+		<#list 3..8 as gradeNum>
+			<#list ['a', 'b', 'c'] as gradeLetter>
+				<#list ['', '+'] as gradeSign>
+					<#assign grades = grades + [gradeNum + gradeLetter + gradeSign] />
 				</#list>
 			</#list>
-		</select>
+		</#list>
+		<@f.select path="boulder.estimatedGrade" options=grades placeholder="Cotation estimée" label="" required="true" />
+		<@f.inputWrapper path="boulder.holds">
 		<svg 
+			<@f.id />
+			<@f.ariaInvalid />
 			viewBox="0 0 160 90"
-			style="width: 100%; aspect-ratio: 16/9; user-select: none;">
+			style="width: 100%; aspect-ratio: 16/9; user-select: none;"
+			>
 			<defs>
 				<g id="hold">
 					<circle x=0 y=0 r=1 fill=none stroke-width=0.1 stroke=red></circle>
@@ -44,7 +47,8 @@
 				/>
 			</g>
 		</svg>
-		<input type="hidden" id="holdsInput" name="holds" />
+		<@f.hiddenInput path="boulder.holds" id="holdsInput" />
+		</@f.inputWrapper>
 		<button type="submit">Créer</button>
 	</form>
 	<script type="text/javascript" src="/bundle/boulders/new.js"></script>
