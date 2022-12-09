@@ -58,11 +58,6 @@ public class BoulderController {
 			BindingResult bindingResult) {
 		
 		if (bindingResult.hasErrors()) {
-			System.out.println("errors");
-			for (var e : bindingResult.getAllErrors()) {
-				System.out.println(e);
-			}
-			System.out.println(boulder.getEstimatedGrade());
 			return "boulders/new";
 		}
 		

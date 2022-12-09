@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: classpath*:db/changelog/migrations/0000001_init.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000002_appuser.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000003_uniqueusername.sql

@@ -1,9 +1,15 @@
 <#macro extraAttrs extras>
-	<#list extras as attrName, attrValue>${attrName}="${attrValue}"</#list> 
+	<#if extras?is_hash>
+		<#list extras as attrName, attrValue>${attrName}="${attrValue}"</#list> 
+	</#if>
 </#macro>
     	
 <#macro id prefix="">
-	<#assign stringId=prefix + spring.status.expression?replace('[','')?replace(']','') />
+	<#if spring.status.expression??>
+		<#assign stringId=prefix + spring.status.expression?replace('[','')?replace(']','') />
+	<#else>
+		<#assign stringId=prefix + spring.status.path />
+	</#if>
 	id=${stringId}
 </#macro>
 
@@ -16,10 +22,14 @@
     <#if spring.stringStatusValue?is_string && spring.stringStatusValue == value>selected</#if>
 </#macro>
 
-<#macro errorMessages>
-	<#list spring.status.errorMessages as message>
-		<span class="input-error" <@id "error_" />>${message}</span>
-	</#list>
+<#macro errorMessages extras...>
+	<#if spring.status.errorMessages?size gt 0>
+		<div class="pan-input--errors" <@id "error_" /> <@extraAttrs extras />>
+			<#list spring.status.errorMessages as message>
+				<span class="input-error">${message?no_esc}</span>
+			</#list>
+		</div>
+	</#if>
 </#macro>
 
 <#macro inputWrapper path label="">
@@ -28,11 +38,25 @@
 		<label>
 			${label}
 			<#nested />
-			<div class="pan-input--errors">
-				<@errorMessages />
-			</div>
+			<@errorMessages />
 		</label>
 	</div>
+</#macro>
+
+<#macro csrf>
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+</#macro>
+
+<#macro form path extras...>
+	<@spring.bind path />
+	<form <@id /> <@ariaInvalid /> <@extraAttrs extras />>
+		<@csrf />
+		 
+		 <div class="form-errors">
+		 	<@errorMessages />
+		 </div>
+		 <#nested />
+	</form>
 </#macro>
 
 <#macro input path label="" extras...>

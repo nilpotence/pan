@@ -1,3 +1,5 @@
+<#import "/common/form.ftlh" as f />
+
 <#macro main title="Pan">
 <!doctype html>
 <html lang="en">
@@ -16,7 +18,17 @@
 			  </ul>
 			  <ul>
 				  <li><a href="<@spring.url '/boulders' />">Les blocs</a></li>
-				  <li><a href="<@spring.url '/boulders/new' />">Créer</a></li>
+				  <#if currentUser??>
+				  	<li>${currentUser.username} (<a href="#" onclick="logout()">Se deconnecter</a>)
+				  		<form style="display: none;" id="logoutForm" action="/signout" method="POST">
+				  			<@f.csrf />
+				  			<button type="submit">se deconnecter</button>
+				  		</form>
+				  	</li>
+				  <#else>
+				  	<li><a href="/signup">Créer un compte</a></li>
+				  	<li><a href="/signin">Se connecter</a></li>
+				  </#if>
 			  </ul>
 		  </nav>
     	<#nested />

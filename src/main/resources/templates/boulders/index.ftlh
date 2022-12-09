@@ -1,5 +1,8 @@
 <@layout.main title="Les blocs">
-	<h1>Les blocs</h1>
+	<h1 style="display: flex; justify-content: space-between; align-items: center;">
+		Les blocs 
+		<a href="/boulders/new" role="button">Créer</a>
+	</h1>
 	
 	<table>
 		<thead>
