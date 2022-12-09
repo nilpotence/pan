@@ -54,6 +54,7 @@ public class AccountController {
 		
 		user.setPassword(pwdEncoder.encode(user.getPassword()));
 		user.setPasswordConfirmation(user.getPassword());
+		user.setRole(AppUser.Role.USER);
 		
 		userRepository.save(user);
 		

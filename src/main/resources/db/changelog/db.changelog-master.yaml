@@ -5,3 +5,7 @@ databaseChangeLog:
       file: classpath*:db/changelog/migrations/0000002_appuser.sql
   - include:
       file: classpath*:db/changelog/migrations/0000003_uniqueusername.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000004_boulderaudit.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000005_appuserrole.sql

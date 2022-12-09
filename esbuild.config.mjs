@@ -14,7 +14,8 @@ esbuild
 	.build({
 		entryPoints: [
 			'src/main/resources/frontend/entrypoints/index.js',
-			'src/main/resources/frontend/entrypoints/boulders/new.js'
+			'src/main/resources/frontend/entrypoints/boulders/new.js',
+			'src/main/resources/frontend/entrypoints/boulders/index.js'
 		],
 		outdir: 'target/classes/static/bundle/',
 		loader: {

@@ -4,6 +4,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import fr.ffcam.pan.models.PanEntity;
 import fr.ffcam.pan.models.users.AppUser;
 
 @Service
@@ -24,5 +25,12 @@ public class AuthService {
 		SecurityContextHolder.getContext().setAuthentication(
 			new UsernamePasswordAuthenticationToken(user, user.getPassword(), null)
 		);
+	}
+	
+	public boolean canUpdate(PanEntity entity) {
+		var user = getCurrentUser();
+		return user != null &&
+				(user.getRole() == AppUser.Role.ADMIN || user.getId().equals(entity.getCreatedBy().getId()));
+			
 	}
 }

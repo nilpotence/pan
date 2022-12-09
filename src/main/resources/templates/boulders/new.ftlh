@@ -2,7 +2,7 @@
 
 <@layout.main title="Créer un nouveau bloc">
 	<h1>Créer un nouveau bloc</h1>
-	<form action="<@spring.url '/boulders/new' />" method="POST">
+	<@f.form path="boulder" action="/boulders/new">
 		<@f.input path="boulder.name" label="" type="text" placeholder="Nom du bloc" /> 
 		<#assign grades = [] />
 		<#list 3..8 as gradeNum>
@@ -50,6 +50,6 @@
 		<@f.hiddenInput path="boulder.holds" id="holdsInput" />
 		</@f.inputWrapper>
 		<button type="submit">Créer</button>
-	</form>
+	</@f.form>
 	<script type="text/javascript" src="/bundle/boulders/new.js"></script>
 </@layout.main>

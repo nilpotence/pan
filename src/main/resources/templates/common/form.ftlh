@@ -47,11 +47,15 @@
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 </#macro>
 
-<#macro form path extras...>
+<#macro form path method="POST" extras...>
 	<@spring.bind path />
-	<form <@id /> <@ariaInvalid /> <@extraAttrs extras />>
+	<form <@id /> <@ariaInvalid /> method="${(method == 'GET')?then('GET','POST')}" <@extraAttrs extras />>
 		<@csrf />
 		 
+		 <#if method != 'GET' && method != 'POST'>
+		 	<input type="hidden" name="_method" value=${method}
+		 </#if>
+
 		 <div class="form-errors">
 		 	<@errorMessages />
 		 </div>

@@ -17,5 +17,4 @@ public class PanControllerAdvice {
 	public AppUser getCurrentUser() {
 		return authService.getCurrentUser();
 	}
-	
 }

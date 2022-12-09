@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -12,6 +14,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Getter;
@@ -44,9 +47,17 @@ public class AppUser implements UserDetails {
 	@Transient
 	private String passwordConfirmation;
 	
+	public enum Role {
+		USER,
+		ADMIN
+	}
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Role role;
+	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+		return AuthorityUtils.createAuthorityList(getRole().name());
 	}
 
 	@Override
