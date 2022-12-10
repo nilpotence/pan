@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 import fr.ffcam.pan.config.AuthService;
@@ -60,12 +61,7 @@ public class BoulderController {
 	
 	@DeleteMapping("/boulders/{id}")
 	@Transactional
-	public String delete(@PathVariable("id") UUID id) {
-		
-		var boulder = boulderRepository
-				.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-		
+	public String delete(@PathVariable("id") Boulder boulder) {
 		if (!authService.canUpdate(boulder)) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 		}
@@ -73,6 +69,44 @@ public class BoulderController {
 		boulderRepository.delete(boulder);
 		
 		return "redirect:/boulders";
+	}
+	
+	@GetMapping(path = "/boulders/{id}/edit")
+	public String editForm(@PathVariable("id") Boulder boulder, Model model) {
+		if (!authService.canUpdate(boulder)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+		}
+		
+		model.addAttribute("boulder", boulder);
+		
+		return "boulders/edit";
+	}
+	
+	@PutMapping(path = "/boulders/{id}/edit")
+	@Transactional
+	public String edit(
+			@PathVariable("id") Boulder boulder, 
+			@ModelAttribute("boulder") @Valid Boulder updatedBoulder,
+			BindingResult results) {
+		
+		if (results.hasErrors()) {
+			return "boulders/edit";
+		}
+		
+		if (!authService.canUpdate(boulder)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+		}
+		
+		boulder.setName(updatedBoulder.getName());
+		boulder.setEstimatedGrade(updatedBoulder.getEstimatedGrade());
+		boulder.setHolds(updatedBoulder.getHolds());
+		
+		boulder.setLastUpdatedAt(LocalDateTime.now());
+		boulder.setLastUpdatedBy(authService.getCurrentUser());
+		
+		boulderRepository.save(boulder);
+		
+		return "redirect:/boulders/{id}";
 	}
 	
 	@GetMapping("/boulders/new")

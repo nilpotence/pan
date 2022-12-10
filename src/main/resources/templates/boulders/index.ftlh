@@ -13,7 +13,7 @@
 				<th>Nom du bloc</th>
 				<th>Cotation estimée</th>
 				<th>Ouvreur</th>
-				<th colspan="2" style="width: 1%;">action</th>
+				<th colspan="3" style="width: 1%;">action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -26,6 +26,9 @@
 						<a href="boulders/${b.id}">Voir</a>
 					</td>
 					<@auth.ifCanUpdate b>
+						<td>
+							<a href="boulders/${b.id}/edit">Modifier</a>
+						</td>
 						<td>
 							<a 
 								href="#"

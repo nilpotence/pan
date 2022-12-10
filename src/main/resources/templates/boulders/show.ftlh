@@ -1,9 +1,22 @@
+<#import '/common/auth.ftlh' as auth>
+
 <@layout.main title=boulder.name>
-	<h1>${boulder.name} - ${boulder.estimatedGrade}</h1>
+	<h1 style="display: flex; justify-content: space-between; align-items: center;">
+		${boulder.name} - ${boulder.estimatedGrade} 
+	
+		<@auth.ifCanUpdate boulder>
+			<a href="/boulders/${boulder.id}/edit" role="button">Modifier</a>
+		</@auth.ifCanUpdate>
+	</h1>
 
 	<svg 
 		viewBox="${bbox.x?floor} ${bbox.y?floor} ${bbox.width?floor} ${bbox.height?floor}"
-		style="width: 100%; aspect-ratio: ${bbox.width?floor}/${bbox.height?floor}; user-select: none;"
+		style="
+			width: 100%;
+			aspect-ratio: ${bbox.width?floor}/${bbox.height?floor};
+			user-select: none;
+			border: 1px solid var(--form-element-border-color);
+			border-radius: var(--border-radius);"
 	>
 			
 		<defs>
