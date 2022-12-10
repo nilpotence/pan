@@ -48,9 +48,11 @@ function init() {
 		if (!lastTouchStart || (time - lastTouchStart) > 200) {
 			lastTouchStart = time
 			if (isHold(evt)) {
+				evt.preventDefault()
 				dragStart(evt)		
 			}
 		} else {
+			evt.preventDefault()
 			if (isHold(evt)) {
 				deleteHold(evt)
 			} else {
@@ -60,11 +62,17 @@ function init() {
 	}
 	
 	function handleTouchMove (evt) {
-		if (dragged) drag(evt)
+		if (dragged) {
+			evt.preventDefault()
+			drag(evt)
+		}
 	}
 	
 	function handleTouchEnd (evt) {
-		if (dragged) dragEnd(evt)
+		if (dragged) {
+			evt.preventDefault()
+			dragEnd(evt)
+		}
 	}
 	
 	function dragStart(evt) {

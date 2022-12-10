@@ -1,12 +1,21 @@
-<#import '/common/auth.ftlh' as auth>
+<#import '/common/auth.ftlh' as auth />
+<#import '/common/form.ftlh' as f />
 
 <@layout.main title=boulder.name>
 	<h1 style="display: flex; justify-content: space-between; align-items: center;">
 		${boulder.name} - ${boulder.estimatedGrade} 
 	
-		<@auth.ifCanUpdate boulder>
-			<a href="/boulders/${boulder.id}/edit" role="button">Modifier</a>
-		</@auth.ifCanUpdate>
+		<div>
+			<@auth.ifCanUpdate boulder>
+				<a 
+					href="#"
+					role="button"
+					class="delete-boulder-action">
+					Supprimer
+				</a>
+				<a href="/boulders/${boulder.id}/edit" role="button">Modifier</a>
+			</@auth.ifCanUpdate>
+		</div>
 	</h1>
 
 	<svg 
@@ -50,15 +59,22 @@
 			<use class="hold" xlink:href="#hold" x=${h.x?c} y=${h.y?c}></use>
 		</#list>
 	</svg>	
-	<script>
-		const svg = document.querySelector('svg')
-		
-		svg.addEventListener('click', evt => {
-			const pt = svg.createSVGPoint()
-			pt.x = evt.clientX
-			pt.y = evt.clientY
-			
-			console.log(pt.matrixTransform(svg.getScreenCTM().inverse()))
-		})
-	</script>
+	<dialog id="confirmDeleteDialog">
+		<article>
+			<h3>Supprimer le bloc ${boulder.name}</h3>
+			<p>
+				Êtes vous sur de vouloir supprimer le bloc ${boulder.name} ?
+				Attention, Le bloc ne pourra pas être restoré.
+			</p>
+			<footer>
+				<a href="#" id="cancelDeleteAction" role="button" class="secondary">Annuler</a>
+				<a href="#" id="confirmDeleteAction" role="button">Confirmer</a>
+			</footer>
+		</article>
+		<form id="deleteForm" action="/boulders/${boulder.id}" method="POST">
+			<@f.csrf />
+			<input type="hidden" name="_method" value="DELETE" />
+		</form>
+	</dialog>
+	<script type="text/javascript" src="/bundle/boulders/show.js"></script>
 </@layout.main>
