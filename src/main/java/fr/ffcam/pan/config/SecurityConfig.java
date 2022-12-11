@@ -28,7 +28,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 					.antMatchers("/boulders/new", "/boulders/*/edit")
 					.authenticated()
-					.antMatchers(HttpMethod.GET, "/", "/boulders", "/boulders/**", "/img/**", "/bundle/**")
+					.antMatchers(HttpMethod.GET, "/", "/boulders", "/boulders/**", "/img/**", "/bundle/**", "/icons/**")
 					.permitAll()
 					.antMatchers("/signin", "/signup")
 					.permitAll()

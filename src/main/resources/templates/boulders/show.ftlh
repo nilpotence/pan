@@ -5,15 +5,22 @@
 	<h1 style="display: flex; justify-content: space-between; align-items: center;">
 		${boulder.name} - ${boulder.estimatedGrade} 
 	
-		<div>
+		<div style="display: flex;">
 			<@auth.ifCanUpdate boulder>
 				<a 
 					href="#"
 					role="button"
-					class="delete-boulder-action">
-					Supprimer
+					class="delete-boulder-action pan-icon-button secondary"
+					title="Supprimer">
+					<span class="gg-trash"></span>	
 				</a>
-				<a href="/boulders/${boulder.id}/edit" role="button">Modifier</a>
+				<a 
+					href="/boulders/${boulder.id}/edit"
+					role="button"
+					title="Modifier"
+					class="pan-icon-button">
+					<span class="gg-pen"></span>
+				</a>
 			</@auth.ifCanUpdate>
 		</div>
 	</h1>

@@ -49,10 +49,12 @@ function init() {
 			lastTouchStart = time
 			if (isHold(evt)) {
 				evt.preventDefault()
+				evt.stopPropagation()
 				dragStart(evt)		
 			}
 		} else {
 			evt.preventDefault()
+			evt.stopPropagation()
 			if (isHold(evt)) {
 				deleteHold(evt)
 			} else {
@@ -64,6 +66,7 @@ function init() {
 	function handleTouchMove (evt) {
 		if (dragged) {
 			evt.preventDefault()
+			evt.stopPropagation()
 			drag(evt)
 		}
 	}
@@ -71,6 +74,7 @@ function init() {
 	function handleTouchEnd (evt) {
 		if (dragged) {
 			evt.preventDefault()
+			evt.stopPropagation()
 			dragEnd(evt)
 		}
 	}

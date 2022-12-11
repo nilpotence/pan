@@ -7,6 +7,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" media="all" href="<@spring.url '/bundle/index.css' />" />
+		<link rel="stylesheet" href="/icons/css/trash.css" />
+		<link rel="stylesheet" href="/icons/css/pen.css" />
 		<script type="application/javascript" src="<@spring.url '/bundle/index.js' />"></script>
 		<title>${title}</title>
 	</head>
@@ -26,7 +28,6 @@
 							</form>
 						</li>
 					<#else>
-						<li><a href="/signup">Créer un compte</a></li>
 						<li><a href="/signin">Se connecter</a></li>
 					</#if>
 				</ul>

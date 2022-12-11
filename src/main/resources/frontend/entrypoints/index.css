@@ -23,3 +23,12 @@
 .pan-input svg[aria-invalid=true] {
 	border: 1px solid var(--form-element-invalid-border-color);
 }
+
+.pan-icon-button {
+	width: 48px;
+	height: 48px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: calc(var(--spacing) / 3);
+}

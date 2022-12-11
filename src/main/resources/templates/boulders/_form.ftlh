@@ -17,7 +17,7 @@
 			<@f.id />
 			<@f.ariaInvalid />
 			viewBox="0 0 160 90"
-			style="width: 100%; aspect-ratio: 16/9; user-select: none;"
+			style="width: 100%; aspect-ratio: 16/9; user-select: none; background-image: url('/img/pan_web_dark.jpg'); background-size: cover;"
 			>
 			<defs>
 				<g id="hold">
@@ -29,13 +29,6 @@
 			<g id="scene">
 				<clipPath id="holdsClipPath">
 				</clipPath>
-				<image
-					xlink:href="/img/pan_web_dark.jpg"
-					x="0"
-					y="0"
-					width="160"
-					height="90"
-				/>
 				<image
 					xlink:href="/img/pan_web.jpg"
 					x="0"
