@@ -28,10 +28,10 @@ public class ShowBoulderHelper {
 				if (Double.compare(hold.y, maxY) > 0) maxY = hold.y;
 			}
 			
-			minX -= 10;
-			maxX += 10;
-			minY -= 10;
-			maxY += 10;
+			minX -= 100;
+			maxX += 100;
+			minY -= 100;
+			maxY += 100;
 			
 			double width = maxX - minX;
 			double height = maxY - minY;

@@ -37,9 +37,9 @@
 			
 		<defs>
 			<g id="hold">
-				<circle x=0 y=0 r=1 fill=none stroke-width=0.1 stroke=red></circle>
+				<circle x=0 y=0 r=10 fill=none stroke-width=1 stroke=red></circle>
 			</g>
-			<circle id="holdClipPath" x=0 y=0 r=3></circle>
+			<circle id="holdClipPath" x=0 y=0 r=30></circle>
 		</defs>
 
 		<clipPath id="holdsClipPath">
@@ -51,15 +51,15 @@
 			xlink:href="/img/pan_web_dark.jpg"
 			x=0
 			y=0
-			width=160
-			height=90	
+			width=1600
+			height=900	
 		/>
 		<image
 			xlink:href="/img/pan_web.jpg"
 			x="0"
 			y="0"
-			width="160"
-			height="90"
+			width="1600"
+			height="900"
 			clip-path="url(#holdsClipPath)"
 		/>
 		<#list bbox.holds as h>
