@@ -1,150 +1,126 @@
-import {createSVGNode} from '../../components/create_node'
-
-
 function isTouchDevice() {
 	return (('ontouchstart' in window) ||
      (navigator.maxTouchPoints > 0) ||
      (navigator.msMaxTouchPoints > 0));
 }
 
-
-let isInit = false
-
-function init() {
-	if (isInit) return
-	isInit = true
-	console.log("init holds editor")
-	
-	const svg = document.querySelector('svg')
-	const pan = svg.querySelector('#scene')
-	const holdsClipPath = pan.querySelector("#holdsClipPath")
+function initCanvas() {
+	const canvas = document.querySelector("canvas")
+	const ctx = canvas.getContext('2d')	
 	const holdsInput = document.querySelector("#holdsInput")
+
+	
+	let holds = []
 	
 	try {
-		console.log(holdsInput.value)
-		const savedHolds = JSON.parse(holdsInput.value)
-		if (Array.isArray(savedHolds)) {
-			savedHolds.forEach(p => drawHold(p))	
-		}
+		holds = JSON.parse (holdsInput.value)
 	} catch (e) {
-		console.log("no saved holds")
+		holds = []
 	}
+
+	canvas.addEventListener(isTouchDevice() ? 'touchstart' : 'mousedown', onTouchDown)	
+	canvas.addEventListener(isTouchDevice() ? 'touchend' : 'mouseup', onTouchUp)	
 	
-	document.addEventListener(isTouchDevice() ? 'touchstart' : 'mousedown', handleTouchStart, false)
-	document.addEventListener(isTouchDevice() ? 'touchmove' : 'mousemove', handleTouchMove, false)
-	document.addEventListener(isTouchDevice() ? 'touchend' : 'mouseup', handleTouchEnd, false)
-	
-	function isHold(evt) {
-		return evt.target.tagName == 'use' && evt.target.classList.contains('hold')
-	}
-	
-	let lastTouchStart
-	let dragged = null
-	let dragTransformMatrix = null
-	let draggedPt = null
-	function handleTouchStart(evt) {
+	let lastTouchStart = 0
+	function onTouchDown(evt) {
 		if (evt.touches && evt.touches.length > 1) return //do not handle multitouch events
 	 	const time = new Date().getTime()
 		if (!lastTouchStart || (time - lastTouchStart) > 200) {
 			lastTouchStart = time
-			if (isHold(evt)) {
-				evt.preventDefault()
-				evt.stopPropagation()
-				dragStart(evt)		
-			}
 		} else {
 			evt.preventDefault()
 			evt.stopPropagation()
-			if (isHold(evt)) {
-				deleteHold(evt)
+			const pos = getPos(evt)
+			const hold = getHold(pos)
+			if (hold) {
+				deleteHold(hold)
 			} else {
-				createHold(evt)
+				createHold(pos)
 			}
 		}	
 	}
 	
-	function handleTouchMove (evt) {
-		if (dragged) {
-			evt.preventDefault()
-			evt.stopPropagation()
-			drag(evt)
-		}
-	}
-	
-	function handleTouchEnd (evt) {
-		if (dragged) {
-			evt.preventDefault()
-			evt.stopPropagation()
-			dragEnd(evt)
-		}
-	}
-	
-	function dragStart(evt) {
-		dragged = evt.target
-		dragTransformMatrix = svg.getScreenCTM().inverse()
-		draggedPt = svg.createSVGPoint()
-	}
-	
-	function drag(evt) {
-		requestAnimationFrame(() => {
-			draggedPt.x = evt.clientX || evt.touches[0].clientX
-			draggedPt.y = evt.clientY || evt.touches[0].clientY
-			draggedPt = draggedPt.matrixTransform(dragTransformMatrix)
-				
-			dragged.setAttribute('x', draggedPt.x)	
-			dragged.setAttribute('y', draggedPt.y)	
-			dragged.__clipPath.setAttribute('x', draggedPt.x)
-			dragged.__clipPath.setAttribute('y', draggedPt.y)
-		})	
-	}
-	
-	function dragEnd() {
-		dragged = null	
-		dragTransformMatrix = null
-		draggedPt = null
-
-		updateInput()
-	}
-	
-	function deleteHold(evt) {
-		requestAnimationFrame(() => {
-			pan.removeChild(evt.target)
-			holdsClipPath.removeChild(evt.target.__clipPath)
+	function onTouchUp(evt) {
 		
-			updateInput()
+	}
+	
+	function getPos(evt) {
+		const rect = canvas.getBoundingClientRect()
+		const widthRatio = rect.width / 160
+		const heightRatio = rect.height / 90
+		console.log(evt)
+		return {
+			x: ((evt.clientX || evt.touches[0].clientX) - rect.left) / widthRatio,
+			y: ((evt.clientY || evt.touches[0].clientY) - rect.top) / heightRatio
+		}
+	}
+	
+	function getHold(pos) {
+		for (let i = 0; i < holds.length; i++) {
+			const h = holds[i]
+			
+			if ((Math.pow((pos.x - h.x), 2) + Math.pow((pos.y - h.y), 2)) < Math.pow(3, 2)) {
+				return h
+			}
+		}
+	}
+	
+	function createHold(pos) {
+		holds.push({
+			x: pos.x,
+			y: pos.y,
 		})
-	}
-	
-	function createHold(evt) {
-		const pt = svg.createSVGPoint()
-		pt.x = evt.clientX || evt.touches[0].clientX
-		pt.y = evt.clientY || evt.touches[0].clientY
 		
-		const ptr = pt.matrixTransform(svg.getScreenCTM().inverse())
-		
-		requestAnimationFrame(() => drawHold(ptr))
-	}
-	
-	function drawHold(ptr) {
-		const newHold = createSVGNode(`<use class="hold" xlink:href="#hold" x=${ptr.x} y=${ptr.y}></use>`)
-		const newHoldClipPath  = createSVGNode(`<use xlink:href="#holdClipPath" x=${ptr.x} y=${ptr.y}></use>`)
-		newHold.__clipPath = newHoldClipPath
-		
-		pan.appendChild(newHold)
-		holdsClipPath.appendChild(newHoldClipPath)
-
+		requestAnimationFrame(() => draw())
 		updateInput()
+	}
+	
+	function deleteHold(h) {
+		holds.splice(holds.indexOf(h), 1)
+		requestAnimationFrame(() => draw())
+		updateInput()
+	}
+	
+	
+	const holdHaloPath = new Path2D()
+	holdHaloPath.arc(0,0,3,0, 2 * Math.PI)	
+	
+	const holdPath = new Path2D()
+	holdPath.arc(0, 0, 1, 0, 2 * Math.PI)
+	
+	function draw() {
+		ctx.save()
+		ctx.clearRect(0,0, canvas.width, canvas.height)
+		ctx.fillStyle = 'rgba(0,0,0,0.4)'
+		ctx.fillRect(0, 0, canvas.width, canvas.height)
+		
+		ctx.save()
+		ctx.globalCompositeOperation = 'destination-out'
+		
+		ctx.fillStyle = "red"
+		holds.forEach(h => {
+			ctx.save()
+			ctx.translate(h.x, h.y)
+			ctx.fill(holdHaloPath)
+			ctx.restore()
+		})
+		ctx.restore()
+		ctx.strokeStyle = 'red'
+		holds.forEach(h => {
+			ctx.save()
+			ctx.translate(h.x, h.y)
+			ctx.stroke(holdPath)
+			ctx.restore()
+		})
+		ctx.restore()
 	}
 	
 	function updateInput() {
-		holdsInput.value = JSON.stringify(
-			Array.from(
-				pan.querySelectorAll('.hold'))
-					.map(h => ({x: h.getAttribute('x'), y: h.getAttribute('y')})
-			)
-		)
+		holdsInput.value = JSON.stringify(holds)
 	}
+	
+	draw()
 }
 
+initCanvas()
 
-init()

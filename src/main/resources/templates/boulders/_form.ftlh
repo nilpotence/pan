@@ -13,32 +13,11 @@
 		</#list>
 		<@f.select path="boulder.estimatedGrade" options=grades placeholder="Cotation estimée" label="" required="true" />
 		<@f.inputWrapper path="boulder.holds">
-		<svg 
-			<@f.id />
-			<@f.ariaInvalid />
-			viewBox="0 0 160 90"
-			style="width: 100%; aspect-ratio: 16/9; user-select: none; background-image: url('/img/pan_web_dark.jpg'); background-size: cover;"
-			>
-			<defs>
-				<g id="hold">
-					<circle x=0 y=0 r=1 fill=none stroke-width=0.1 stroke=red></circle>
-					<circle x=0 y=0 r=3 fill="rgba(255,255,255,0)"></circle>
-				</g>
-				<circle id="holdClipPath" x=0 y=0 r=3></circle>
-			</defs>
-			<g id="scene">
-				<clipPath id="holdsClipPath">
-				</clipPath>
-				<image
-					xlink:href="/img/pan_web.jpg"
-					x="0"
-					y="0"
-					width="160"
-					height="90"
-					clip-path="url(#holdsClipPath)"
-				/>
-			</g>
-		</svg>
+		<canvas
+			style="background-image: url('/img/pan_web.jpg'); background-size: cover; width: 100%; aspect-ratio: 16/9; user-select: none;"
+			width=160
+			height=90>
+		</canvas>
 		<@f.hiddenInput path="boulder.holds" id="holdsInput" />
 		</@f.inputWrapper>
 		<button type="submit">${actionLabel}</button>
