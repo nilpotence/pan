@@ -46,8 +46,8 @@ function initCanvas() {
 	
 	function getPos(evt) {
 		const rect = canvas.getBoundingClientRect()
-		const widthRatio = rect.width / 160
-		const heightRatio = rect.height / 90
+		const widthRatio = rect.width / 1600
+		const heightRatio = rect.height / 900
 		console.log(evt)
 		return {
 			x: ((evt.clientX || evt.touches[0].clientX) - rect.left) / widthRatio,
@@ -59,7 +59,7 @@ function initCanvas() {
 		for (let i = 0; i < holds.length; i++) {
 			const h = holds[i]
 			
-			if ((Math.pow((pos.x - h.x), 2) + Math.pow((pos.y - h.y), 2)) < Math.pow(3, 2)) {
+			if ((Math.pow((pos.x - h.x), 2) + Math.pow((pos.y - h.y), 2)) < Math.pow(30, 2)) {
 				return h
 			}
 		}
@@ -83,10 +83,10 @@ function initCanvas() {
 	
 	
 	const holdHaloPath = new Path2D()
-	holdHaloPath.arc(0,0,3,0, 2 * Math.PI)	
+	holdHaloPath.arc(0,0,30,0, 2 * Math.PI)	
 	
 	const holdPath = new Path2D()
-	holdPath.arc(0, 0, 1, 0, 2 * Math.PI)
+	holdPath.arc(0, 0, 10, 0, 2 * Math.PI)
 	
 	function draw() {
 		ctx.save()

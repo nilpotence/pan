@@ -15,8 +15,8 @@
 		<@f.inputWrapper path="boulder.holds">
 		<canvas
 			style="background-image: url('/img/pan_web.jpg'); background-size: cover; width: 100%; aspect-ratio: 16/9; user-select: none;"
-			width=160
-			height=90>
+			width=1600
+			height=900>
 		</canvas>
 		<@f.hiddenInput path="boulder.holds" id="holdsInput" />
 		</@f.inputWrapper>
