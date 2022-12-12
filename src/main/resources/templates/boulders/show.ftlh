@@ -26,10 +26,10 @@
 	</h1>
 
 	<svg 
-		viewBox="${bbox.x?floor} ${bbox.y?floor} ${bbox.width?floor} ${bbox.height?floor}"
+		viewBox="${bbox.x?floor?c} ${bbox.y?floor?c} ${bbox.width?floor?c} ${bbox.height?floor?c}"
 		style="
 			width: 100%;
-			aspect-ratio: ${bbox.width?floor}/${bbox.height?floor};
+			aspect-ratio: ${bbox.width?floor?c}/${bbox.height?floor?c};
 			user-select: none;
 			border: 1px solid var(--form-element-border-color);
 			border-radius: var(--border-radius);"

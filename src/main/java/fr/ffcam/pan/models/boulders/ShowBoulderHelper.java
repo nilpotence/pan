@@ -28,15 +28,15 @@ public class ShowBoulderHelper {
 				if (Double.compare(hold.y, maxY) > 0) maxY = hold.y;
 			}
 			
-			minX -= 100;
-			maxX += 100;
-			minY -= 100;
-			maxY += 100;
+			minX = Math.max(0, minX - 100);
+			maxX = Math.min(1600, maxX + 100);
+			minY = Math.max(0, minY - 100);
+			maxY = Math.min(900, maxY + 100);
 			
 			double width = maxX - minX;
 			double height = maxY - minY;
 			
-			return new BoulderBoundingBox(Math.max(0, minX), Math.max(0, minY), width, height, List.of(holds));
+			return new BoulderBoundingBox(minX, minY, width, height, List.of(holds));
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
