@@ -1,13 +1,17 @@
 package fr.ffcam.pan.controllers;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,10 +40,15 @@ public class BoulderController {
 	private BoulderRepository boulderRepository;
 	
 	@GetMapping("/boulders")
-	public String index(Model model) {
-		List<Boulder> boulders = boulderRepository.findAll();
+	public String index(Model model, @SortDefault(sort = {"createdAt"}, direction = Direction.DESC) Pageable pageable) {
+		Page<Boulder> boulders = boulderRepository.findAll(pageable);
+		
+		var currentSort = pageable.getSort().stream()
+			.map(o -> o.getProperty() + "," + o.getDirection().toString())
+			.collect(Collectors.toList());
 		
 		model.addAttribute("boulders", boulders);
+		model.addAttribute("currentSort", currentSort);
 		
 		return "boulders/index";
 	}

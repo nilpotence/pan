@@ -9,6 +9,8 @@
 		<link rel="stylesheet" type="text/css" media="all" href="<@spring.url '/bundle/index.css' />" />
 		<link rel="stylesheet" href="/icons/css/trash.css" />
 		<link rel="stylesheet" href="/icons/css/pen.css" />
+		<link rel="stylesheet" href="/icons/css/arrow-left.css" />
+		<link rel="stylesheet" href="/icons/css/arrow-right.css" />
 		<script type="application/javascript" src="<@spring.url '/bundle/index.js' />"></script>
 		<title>${title}</title>
 	</head>
