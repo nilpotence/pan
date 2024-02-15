@@ -21,6 +21,9 @@
 					<li><strong>Pan</strong></li>
 				</ul>
 				<ul>
+					<#if currentUser?? && currentUser.role == 'ADMIN'>
+						<li><a href="<@spring.url '/walls' />">Les pans</a></li>
+					</#if>
 					<li><a href="<@spring.url '/boulders' />">Les blocs</a></li>
 					<#if currentUser??>
 						<li>${currentUser.username} (<a href="#" onclick="logout()">Se deconnecter</a>)

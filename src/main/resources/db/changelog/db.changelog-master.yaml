@@ -9,3 +9,9 @@ databaseChangeLog:
       file: classpath*:db/changelog/migrations/0000004_boulderaudit.sql
   - include:
       file: classpath*:db/changelog/migrations/0000005_appuserrole.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000006_wall.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000007_wallimagepath.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000008_wall_name.sql

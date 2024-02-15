@@ -1,0 +1,1 @@
+ALTER TABLE wall DROP COLUMN image_path;

@@ -1,19 +1,16 @@
 package fr.ffcam.pan.models.boulders;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import fr.ffcam.pan.models.BaseEntity;
 import fr.ffcam.pan.models.PanEntity;
 import fr.ffcam.pan.models.users.AppUser;
 import lombok.Getter;
@@ -24,11 +21,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class Boulder implements PanEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	
+public class Boulder extends BaseEntity implements PanEntity {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3412872193310225597L;
+
 	@NotBlank(message = "Vous devez choisir un nom pour votre bloc !")
 	private String name;
 	

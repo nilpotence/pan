@@ -113,3 +113,12 @@
 		<@extraAttrs extras /> />
 		
 </#macro>
+
+
+<#macro fileInput path="" label="" extras...>
+	<@inputWrapper path label>
+		<input
+			type="file"
+			<@extraAttrs extras /> />
+	</@inputWrapper>
+</#macro>
