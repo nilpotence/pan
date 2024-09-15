@@ -9,3 +9,11 @@ databaseChangeLog:
       file: classpath*:db/changelog/migrations/0000004_boulderaudit.sql
   - include:
       file: classpath*:db/changelog/migrations/0000005_appuserrole.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000006_customPhoto.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000007_customPhotoFields.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000008_custom_photo_default_size.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000009_default_photo.sql

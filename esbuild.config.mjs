@@ -15,7 +15,8 @@ esbuild
 		entryPoints: [
 			'src/main/resources/frontend/entrypoints/index.js',
 			'src/main/resources/frontend/entrypoints/boulders/new.js',
-			'src/main/resources/frontend/entrypoints/boulders/show.js'
+			'src/main/resources/frontend/entrypoints/boulders/show.js',
+			'src/main/resources/frontend/entrypoints/boulders/defaultphotos/new.js',
 		],
 		outdir: 'target/classes/static/bundle/',
 		loader: {
@@ -25,6 +26,7 @@ esbuild
 		},
 		bundle: true,
 		watch: watch,
-		minify: true
+		minify: true,
+		sourcemap: true,
 	})
 	.catch(() => process.exit(1))
