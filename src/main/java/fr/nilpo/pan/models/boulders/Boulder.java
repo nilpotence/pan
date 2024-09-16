@@ -39,10 +39,14 @@ public class Boulder implements PanEntity {
 	@ValidHolds
 	private String holds;
 	
+	@NotNull(message = "Vous devez choisir une photo pour votre bloc !")
+	@Column(nullable = false)
 	private byte[] customPhoto;
 	
+	@Column(nullable = false)
 	private int customPhotoWidth = 0;
 	
+	@Column(nullable = false)
 	private int customPhotoHeight = 0;
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)

@@ -27,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 import fr.nilpo.pan.config.AuthService;
 import fr.nilpo.pan.models.boulders.Boulder;
 import fr.nilpo.pan.models.boulders.BoulderRepository;
+import fr.nilpo.pan.models.boulders.DefaultPhoto;
 import fr.nilpo.pan.models.boulders.DefaultPhotoRepository;
 import fr.nilpo.pan.models.boulders.ShowBoulderHelper;
 
@@ -90,9 +91,11 @@ public class BoulderController {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 		}
 
-		var defaultPhoto = defaultPhotoRepository
-				.findFirstByOrderByCreatedAtDesc()
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+		var defaultPhoto = new DefaultPhoto();
+
+		defaultPhoto.setWidth(boulder.getCustomPhotoWidth());
+		defaultPhoto.setHeight(boulder.getCustomPhotoHeight());
+		defaultPhoto.setRawData(boulder.getRawCustomPhoto());
 		
 		model.addAttribute("defaultPhoto", defaultPhoto);
 		model.addAttribute("boulder", boulder);
@@ -148,7 +151,6 @@ public class BoulderController {
 			BindingResult bindingResult) {
 		
 		if (bindingResult.hasErrors()) {
-			
 			System.out.println(bindingResult.getAllErrors());
 			
 			return "boulders/new";

@@ -52,4 +52,8 @@ public class DefaultPhoto implements PanEntity {
 	public String getData() {
 		return ImageHelper.toDataURL(this.data);
 	}
+	
+	public void setRawData(byte[] data) {
+		this.data = data;
+	}
 }
