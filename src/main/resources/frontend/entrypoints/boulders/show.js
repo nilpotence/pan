@@ -28,6 +28,9 @@ class DeleteDialog {
 class TickDialog {
 	constructor() {
 		this.dialog = document.querySelector("#tickDialog")
+		
+		if (!this.dialog) return
+		
 		this.tickForm = this.dialog.querySelector("form#tick")
 
 		this.cancelAction = this.dialog.querySelector("#cancelTickAction")	

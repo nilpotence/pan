@@ -110,36 +110,38 @@
 		</table>
 	</div>
 	
-	<dialog id="tickDialog">
-		<article>
-			<h3>Détail de l'enchainement</h3>
-			<@f.form path="tick" action="/boulders/${boulder.id}/tick" method="POST">
-				<div class="pan-input">
-					<label>
-						<input name="ticked" type="checkbox" <#if tick?? && tick.appUser??>checked</#if> />
-						J'ai enchainé
-					</label>
-				</div>
-				<@f.input path="tick.comment" placeholder="commentaire" /><#assign grades = [] />
-				<#list 3..8 as gradeNum>
-					<#list ['a', 'b', 'c'] as gradeLetter>
-						<#list ['', '+'] as gradeSign>
-							<#assign grades = grades + [gradeNum + gradeLetter + gradeSign] />
+	<#if tick??>
+		<dialog id="tickDialog">
+			<article>
+				<h3>Détail de l'enchainement</h3>
+				<@f.form path="tick" action="/boulders/${boulder.id}/tick" method="POST">
+					<div class="pan-input">
+						<label>
+							<input name="ticked" type="checkbox" <#if tick?? && tick.appUser??>checked</#if> />
+							J'ai enchainé
+						</label>
+					</div>
+					<@f.input path="tick.comment" placeholder="commentaire" /><#assign grades = [] />
+					<#list 3..8 as gradeNum>
+						<#list ['a', 'b', 'c'] as gradeLetter>
+							<#list ['', '+'] as gradeSign>
+								<#assign grades = grades + [gradeNum + gradeLetter + gradeSign] />
+							</#list>
 						</#list>
 					</#list>
-				</#list>
-				<@f.select 
-					path="tick.estimatedGrade"
-					options=grades
-					placeholder="Cotation estimée" 
-					label="" />
-			</@f.form>
-			<footer>
-				<a href="#" id="cancelTickAction" role="button" class="secondary">Annuler</a>
-				<a href="#" id="confirmTickAction" role="button">Confirmer</a>
-			</footer>
-		</article>
-	</dialog>
+					<@f.select 
+						path="tick.estimatedGrade"
+						options=grades
+						placeholder="Cotation estimée" 
+						label="" />
+				</@f.form>
+				<footer>
+					<a href="#" id="cancelTickAction" role="button" class="secondary">Annuler</a>
+					<a href="#" id="confirmTickAction" role="button">Confirmer</a>
+				</footer>
+			</article>
+		</dialog>
+	</#if>
 	
 	<dialog id="confirmDeleteDialog">
 		<article>
