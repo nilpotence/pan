@@ -1,14 +1,10 @@
 package fr.nilpo.pan.models.boulders;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import fr.nilpo.pan.models.PanEntity;
@@ -21,11 +17,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class DefaultPhoto implements PanEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	
+public class DefaultPhoto extends PanEntity {
+	private static final long serialVersionUID = 8214339180301319373L;
+
 	@Column(nullable = false)
 	private byte[] data;
 	

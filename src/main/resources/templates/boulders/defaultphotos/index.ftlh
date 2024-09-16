@@ -1,5 +1,6 @@
 <#import '/common/auth.ftlh' as auth>
 <#import '/common/form.ftlh' as f>
+<#import '/common/table.ftlh' as t>
 
 <@layout.main title="Photos par defaut">
 	<h1 style="display: flex; justify-content: space-between; align-items: center;">
@@ -27,24 +28,7 @@
 			
 		</tbody>
 	</table>
-	<div style="padding-left: 10px;display: flex; justify-content: end;">
-		<#if photos.getNumber() gt 0>
-			<a 
-				role="button"
-				style="padding: 0;"
-				class="pan-icon-button"
-				href="?${show(photos.getPageable().withPage(photos.getNumber() - 1))}">
-				<span class="gg-arrow-left"></span>							
-			</a>
-		</#if>
-		<#if photos.getNumber() < (photos.getTotalPages() - 1)>
-			<a
-				role="button"
-				style="padding: 0;"
-				class="pan-icon-button"
-				href="?${show(photos.getPageable().withPage(photos.getNumber() + 1))}">
-				<span class="gg-arrow-right"></span>							
-			</a>
-		</#if>
-	</div>
+	
+	<@t.pagination photos />
+
 </@layout.main>

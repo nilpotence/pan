@@ -1,5 +1,6 @@
 <#import '/common/auth.ftlh' as auth>
 <#import '/common/form.ftlh' as f>
+<#import '/common/table.ftlh' as t>
 
 <@layout.main title="Les blocs">
 	<h1 style="display: flex; justify-content: space-between; align-items: center;">
@@ -26,7 +27,7 @@
 		<tbody>
 			<#list boulders.iterator() as b>
 				<tr>
-					<td>${b.name} - ${b.estimatedGrade}</td>
+					<td><strong>${b.name}</strong> - <i>${b.estimatedGrade}</i></td>
 					<td>
 						<a href="boulders/${b.id}">Voir</a>
 					</td>
@@ -36,26 +37,8 @@
 			
 		</tbody>
 	</table>
-	<div style="padding-left: 10px;display: flex; justify-content: end;">
-		<#if boulders.getNumber() gt 0>
-			<a 
-				role="button"
-				style="padding: 0;"
-				class="pan-icon-button"
-				href="?${show(boulders.getPageable().withPage(boulders.getNumber() - 1))}">
-				<span class="gg-arrow-left"></span>							
-			</a>
-		</#if>
-		<#if boulders.getNumber() < (boulders.getTotalPages() - 1)>
-			<a
-				role="button"
-				style="padding: 0;"
-				class="pan-icon-button"
-				href="?${show(boulders.getPageable().withPage(boulders.getNumber() + 1))}">
-				<span class="gg-arrow-right"></span>							
-			</a>
-		</#if>
-	</div>
+	
+	<@t.pagination boulders />
 	
 	<script type="text/javascript">
 		const select = document.querySelector("#sortSelect")

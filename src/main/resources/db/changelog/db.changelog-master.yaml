@@ -19,3 +19,5 @@ databaseChangeLog:
       file: classpath*:db/changelog/migrations/0000009_default_photo.sql
   - include:
       file: classpath*:db/changelog/migrations/0000010_custom_photo_not_null.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000011_tick.sql

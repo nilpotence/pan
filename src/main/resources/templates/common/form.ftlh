@@ -32,8 +32,8 @@
 	</#if>
 </#macro>
 
-<#macro inputWrapper path label="">
-	<div class="pan-input">
+<#macro inputWrapper path label="" style="">
+	<div class="pan-input" style="${style}">
 		<@spring.bind path />
 		<label>
 			${label}
@@ -63,8 +63,8 @@
 	</form>
 </#macro>
 
-<#macro input path label="" extras...>
-	<@inputWrapper path label>
+<#macro input path label="" wrapperStyle="" extras...>
+	<@inputWrapper path label wrapperStyle>
 		<input 
 			<@id />
 			name="${spring.status.expression}"

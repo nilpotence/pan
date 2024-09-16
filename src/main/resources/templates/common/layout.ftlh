@@ -23,7 +23,7 @@
 				<ul>
 					<li><a href="<@spring.url '/boulders' />">Les blocs</a></li>
 					<#if currentUser??>
-						<li>${currentUser.username} (<a href="#" onclick="logout()">Se deconnecter</a>)
+						<li>${currentUser.username} (<a href="#" onclick="logout()" style="font-style: italic;">Se deconnecter</a>)
 							<form style="display: none;" id="logoutForm" action="/signout" method="POST">
 								<@f.csrf />
 								<button type="submit">se deconnecter</button>

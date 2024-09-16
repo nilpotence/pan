@@ -1,14 +1,10 @@
 package fr.nilpo.pan.models.boulders;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,11 +20,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class Boulder implements PanEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private UUID id;
-	
+public class Boulder extends PanEntity {
+	private static final long serialVersionUID = 7218997923315836091L;
+
 	@NotBlank(message = "Vous devez choisir un nom pour votre bloc !")
 	private String name;
 	

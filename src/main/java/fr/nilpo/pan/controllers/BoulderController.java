@@ -30,6 +30,8 @@ import fr.nilpo.pan.models.boulders.BoulderRepository;
 import fr.nilpo.pan.models.boulders.DefaultPhoto;
 import fr.nilpo.pan.models.boulders.DefaultPhotoRepository;
 import fr.nilpo.pan.models.boulders.ShowBoulderHelper;
+import fr.nilpo.pan.models.boulders.Tick;
+import fr.nilpo.pan.models.boulders.TickRepository;
 
 
 @Controller
@@ -43,6 +45,9 @@ public class BoulderController {
 	
 	@Autowired
 	private DefaultPhotoRepository defaultPhotoRepository;
+	
+	@Autowired
+	private TickRepository tickRepository;
 	
 	@GetMapping("/boulders")
 	public String index(Model model, @SortDefault(sort = {"createdAt"}, direction = Direction.DESC) Pageable pageable) {
@@ -59,14 +64,29 @@ public class BoulderController {
 	}
 	
 	@GetMapping("/boulders/{id}")
-	public String show(@PathVariable("id") UUID id, Model model) {
+	public String show(
+			@PathVariable("id") UUID id,
+			@SortDefault(sort = {"createdAt"}, direction = Direction.DESC) Pageable pageable,
+			Model model) {
 		Boulder b = boulderRepository
 				.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		
+		if (authService.getCurrentUser() != null) {
+			Tick t = tickRepository
+				.findById(new Tick.TickId(authService.getCurrentUser().getId(), b.getId()))
+				.orElse(new Tick());
+			
+			model.addAttribute("tick", t);
+		}
+		
+		Page<Tick> ticks = tickRepository
+				.findAllByBoulder(b, pageable);
+		
 		var bbox = ShowBoulderHelper.getBoulderBoundingBox(b);
 		
 		model.addAttribute("boulder", b);
+		model.addAttribute("ticks", ticks);
 		model.addAttribute("bbox", bbox);
 		
 		
@@ -178,5 +198,42 @@ public class BoulderController {
 		boulderRepository.save(boulder);
 		
 		return "redirect:" + boulder.getId();
+	}
+	
+	@PostMapping("/boulders/{id}/tick")
+	@Transactional
+	public String tickBoulder(
+		@PathVariable("id") UUID boulderId,
+		String comment,
+		String estimatedGrade,
+		boolean ticked,
+		Model model
+	){
+		var tick = tickRepository
+				.findById(new Tick.TickId(authService.getCurrentUser().getId(), boulderId))
+				.orElse(new Tick());
+		
+		if (tick.getAppUser() == null) {
+			if (ticked) {
+				tick.setAppUser(authService.getCurrentUser());
+				tick.setBoulder(boulderRepository.getReferenceById(boulderId));
+				tick.setCreatedAt(LocalDateTime.now());
+				tick.setComment(comment);
+				tick.setEstimatedGrade(estimatedGrade);
+
+				tickRepository.save(tick);
+			}
+		} else {
+			if (ticked) {
+				tick.setComment(comment);
+				tick.setEstimatedGrade(estimatedGrade);
+		
+				tickRepository.save(tick);
+			} else {
+				tickRepository.delete(tick);
+			}
+		}
+		
+		return "redirect:/boulders/" + boulderId;
 	}
 }
