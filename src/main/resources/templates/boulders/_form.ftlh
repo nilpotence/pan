@@ -20,7 +20,7 @@
 		<@f.inputWrapper path="boulder.holds">
 		<canvas
 			id="boulderCanvas"
-			style="background-image: url('${defaultPhoto.data}'); background-size: cover; width: 100%; aspect-ratio: 16/9; user-select: none;"
+			style="background-image: url('${defaultPhoto.data}'); background-size: cover; width: 100%; user-select: none;"
 			width="${defaultPhoto.width?c}"
 			height="${defaultPhoto.height?c}"
 		</canvas>

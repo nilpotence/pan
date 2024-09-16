@@ -148,6 +148,9 @@ public class BoulderController {
 			BindingResult bindingResult) {
 		
 		if (bindingResult.hasErrors()) {
+			
+			System.out.println(bindingResult.getAllErrors());
+			
 			return "boulders/new";
 		}
 		

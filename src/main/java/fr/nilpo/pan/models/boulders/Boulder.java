@@ -75,4 +75,8 @@ public class Boulder implements PanEntity {
 	public byte[] getRawCustomPhoto() {
 		return customPhoto;
 	}
+	
+	public String getDarkCustomPhoto() {
+		return ImageHelper.toDataURL(ImageHelper.computeDarkImage(this.customPhoto));
+	}
 }

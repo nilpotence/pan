@@ -48,18 +48,18 @@
 			</#list>
 		</clipPath>
 		<image
-			xlink:href="/img/pan_web_dark.jpg"
+			xlink:href="${boulder.darkCustomPhoto}"
 			x=0
 			y=0
-			width=1600
-			height=900	
+			width=${boulder.customPhotoWidth?c}
+			height=${boulder.customPhotoHeight?c}	
 		/>
 		<image
-			xlink:href="/img/pan_web.jpg"
+			xlink:href="${boulder.customPhoto}"
 			x="0"
 			y="0"
-			width="1600"
-			height="900"
+			width="${boulder.customPhotoWidth?c}"
+			height="${boulder.customPhotoHeight?c}"
 			clip-path="url(#holdsClipPath)"
 		/>
 		<#list bbox.holds as h>

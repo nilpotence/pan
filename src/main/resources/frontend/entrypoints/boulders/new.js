@@ -103,7 +103,7 @@ ready(() => {
 		const ctx = canvas.getContext('2d')	
 		const holdsInput = document.querySelector("#holdsInput")
 		
-		const currentPhotoData = canvas.style.backgroundImage;
+		const currentPhotoData = canvas.style.backgroundImage.replace(/^url\(\"(.*)\"\)/, "$1");
 		customPhotoInput.value = currentPhotoData;
 
 		
