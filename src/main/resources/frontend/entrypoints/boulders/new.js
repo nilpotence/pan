@@ -1,96 +1,29 @@
 import ready from '../../components/ready.js'
+import initTakePhoto from '../../components/take_photo.js'
 
 ready(() => {
 	const DEFAULT_WIDTH = 1600
 	let photoWidth = DEFAULT_WIDTH
 	let photoHeight = 0
 	let customPhotoData = null
-	let streaming = false
 	
-	const video = document.querySelector("video")
 	const boulderCanvas = document.querySelector("#boulderCanvas")
-	const photoCanvas = document.createElement("canvas")
 	const customPhotoInput = document.querySelector("#customPhotoInput")
 
+	const customPhotoFileInput = document.querySelector("#customPhotoFileInput")
 	const customPhotoBtn = document.querySelector("#customPhotoBtn")
-	const submitBtn = document.querySelector('#boulderSubmitBtn')
-
-
-	function initCustomPhoto() {
-		console.log("init custom photo")
-		
-		customPhotoBtn.addEventListener("click", evt => {
-			evt.preventDefault()
-			console.log("custom photo")
-			startupCustomPhoto()	
-		})
-		
-		video.addEventListener("click", evt => {
-			evt.preventDefault()
-			takeCustomPhoto()
-		})
-		
-		video.addEventListener('canplay', evt => {
-			evt.preventDefault()
-			setupCustomPhotoStream(evt)
-		}, false)
-	}
-
-	function startupCustomPhoto() {
-		console.log("startupCustomPhoto")
-		
-		let streaming = false
-		
-		navigator
-			.mediaDevices
-			.getUserMedia({ video: { facingMode: 'environment'}, audio: false })
-			.then((stream) => {
-				video.srcObject = stream
-				video.play()	
-				
-				video.style.display = "block"
-				boulderCanvas.style.display = "none"
-				customPhotoBtn.disabled = true
-				submitBtn.disabled = true
-			})
-			.catch((err) => {
-				console.error("Impossible d'accéder à la caméra")
-				console.error(err)
-			})
-			
-		
-	}
 	
-	function setupCustomPhotoStream(evt) {
-		streaming = true
-	}
-	
-	function takeCustomPhoto() {
-		console.log("takeCustomPhoto")
-		
-		if (!streaming) return 
+	customPhotoBtn.addEventListener("click", evt => {
+		evt.preventDefault()
+		customPhotoFileInput.click()
+	})
 
-		photoHeight = (video.videoHeight / video.videoWidth) * photoWidth 
-		photoCanvas.setAttribute("width", photoWidth)
-		photoCanvas.setAttribute("height", photoHeight)
-		
-		const ctx = photoCanvas.getContext("2d")
-		ctx.drawImage(video, 0, 0, photoWidth, photoHeight)
-		customPhotoData = photoCanvas.toDataURL('image/jpeg', 0.6)
-		
-		boulderCanvas.style.backgroundImage = `url(${customPhotoData})`
-		boulderCanvas.setAttribute("width", photoWidth)
-		boulderCanvas.setAttribute("height", photoHeight)
-		customPhotoInput.value = customPhotoData
-		
-		video.style.display = "none"
-		boulderCanvas.style.display = "block"
-		video.srcObject.getTracks().forEach(t => t.stop())
-		customPhotoBtn.disabled = false
-		submitBtn.disabled = false
-		streaming = false
-	}
-
+	initTakePhoto(1600, customPhotoFileInput, null, (data, width, height) => {
+		customPhotoInput.value = data	
+		boulderCanvas.style.backgroundImage = `url("${data}")`
+		boulderCanvas.width = width
+		boulderCanvas.height = height
+	});
 
 	function isTouchDevice() {
 		return (('ontouchstart' in window) ||
@@ -219,7 +152,6 @@ ready(() => {
 		draw()
 	}
 
-	initCustomPhoto()
 	initCanvas()
 })
 

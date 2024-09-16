@@ -12,19 +12,19 @@
 			</#list>
 		</#list>
 		<@f.select path="boulder.estimatedGrade" options=grades placeholder="Cotation estimée" label="" required="true" />
-		<button type="button" id="customPhotoBtn">Prendre une photo personnalisée</button>
-		<video style="display: none; width: 100%;"></video>
+		<button id="customPhotoBtn" type="button">Prendre une photo personnalisée</button>
+		<input style="display: none;" id="customPhotoFileInput" type="file" accept="image/*" capture="camera" />
 		<@f.inputWrapper path="boulder.customPhoto">
 			<@f.hiddenInput path="boulder.customPhoto" id="customPhotoInput" />
 		</@f.inputWrapper>
 		<@f.inputWrapper path="boulder.holds">
-		<canvas
-			id="boulderCanvas"
-			style="background-image: url('${defaultPhoto.data}'); background-size: cover; width: 100%; user-select: none;"
-			width="${defaultPhoto.width?c}"
-			height="${defaultPhoto.height?c}"
-		</canvas>
-		<@f.hiddenInput path="boulder.holds" id="holdsInput" />
+			<canvas
+				id="boulderCanvas"
+				style="background-image: url('${defaultPhoto.data}'); background-size: cover; width: 100%; user-select: none;"
+				width="${defaultPhoto.width?c}"
+				height="${defaultPhoto.height?c}">
+			</canvas>
+			<@f.hiddenInput path="boulder.holds" id="holdsInput" />
 		</@f.inputWrapper>
 		<button id="boulderSubmitBtn" type="submit">${actionLabel}</button>
 	</@f.form>
