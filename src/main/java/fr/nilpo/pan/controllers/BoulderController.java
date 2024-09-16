@@ -108,9 +108,18 @@ public class BoulderController {
 	public String edit(
 			@PathVariable("id") Boulder boulder, 
 			@ModelAttribute("boulder") @Valid Boulder updatedBoulder,
-			BindingResult results) {
+			BindingResult results,
+			Model model) {
 		
 		if (results.hasErrors()) {
+			var defaultPhoto = new DefaultPhoto();
+
+			defaultPhoto.setWidth(boulder.getCustomPhotoWidth());
+			defaultPhoto.setHeight(boulder.getCustomPhotoHeight());
+			defaultPhoto.setRawData(boulder.getRawCustomPhoto());
+			
+			model.addAttribute("defaultPhoto", defaultPhoto);
+			
 			return "boulders/edit";
 		}
 		
@@ -148,10 +157,17 @@ public class BoulderController {
 	@Transactional
 	public String create(
 			@ModelAttribute("boulder") @Valid Boulder boulder,
-			BindingResult bindingResult) {
+			BindingResult bindingResult,
+			Model model) {
 		
 		if (bindingResult.hasErrors()) {
-			System.out.println(bindingResult.getAllErrors());
+			var defaultPhoto = new DefaultPhoto();
+
+			defaultPhoto.setWidth(boulder.getCustomPhotoWidth());
+			defaultPhoto.setHeight(boulder.getCustomPhotoHeight());
+			defaultPhoto.setRawData(boulder.getRawCustomPhoto());
+			
+			model.addAttribute("defaultPhoto", defaultPhoto);
 			
 			return "boulders/new";
 		}
