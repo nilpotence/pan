@@ -57,6 +57,9 @@ public class AccountController {
 		user.setRole(AppUser.Role.USER);
 		
 		userRepository.save(user);
+		user = userRepository
+				.findById(user.getId())
+				.orElseThrow(() -> new RuntimeException("Erreur lors de la création de l'utilisateur"));
 		
 		authService.authenticate(user);
 		
