@@ -20,7 +20,7 @@
 				<tr>
 					<td>${score.user.username}</td>
 					<td>${score.score}</td>
-					<td>${(rankOffset + score?index + 1)}</td>
+					<td>${score.rank}</td>
 				</tr>
 			</#list>
 		</tbody>

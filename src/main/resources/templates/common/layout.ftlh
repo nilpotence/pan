@@ -38,7 +38,8 @@
 				<article>
 					<h3>${currentUser.username}</h3>
 					<p>
-						Votre score est de ${currentUser.score.score} !
+						Votre score est de ${currentUser.score.score}, 
+						Vous êtes <#if currentUser.score.rank == 1>1er.ère<#else>${currentUser.score.rank}ème</#if> !
 					</p>
 					<footer>
 						<a href="#" id="userDialogBackBtn" role="button" class="secondary">Retour</a>

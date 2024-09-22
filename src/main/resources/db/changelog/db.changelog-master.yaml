@@ -23,3 +23,5 @@ databaseChangeLog:
       file: classpath*:db/changelog/migrations/0000011_tick.sql
   - include:
       file: classpath*:db/changelog/migrations/0000012_score_views.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000013_score_views2.sql

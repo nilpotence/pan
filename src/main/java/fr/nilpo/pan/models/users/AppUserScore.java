@@ -26,4 +26,6 @@ public class AppUserScore {
 	private AppUser user;
 	
 	private long score;
+	
+	private long rank;
 }

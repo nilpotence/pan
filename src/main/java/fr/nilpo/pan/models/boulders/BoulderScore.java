@@ -30,4 +30,6 @@ public class BoulderScore {
 	
 	private long score;
 	
+	private long rank;
+	
 }
