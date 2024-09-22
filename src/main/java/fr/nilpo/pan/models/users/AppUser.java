@@ -10,6 +10,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 
@@ -54,6 +55,9 @@ public class AppUser implements UserDetails {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Role role;
+	
+	@OneToOne(mappedBy = "user")
+	private AppUserScore score;
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

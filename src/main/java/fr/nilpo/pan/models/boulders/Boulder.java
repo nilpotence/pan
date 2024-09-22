@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -53,6 +54,9 @@ public class Boulder extends PanEntity {
 	private AppUser lastUpdatedBy;
 	
 	private LocalDateTime lastUpdatedAt;
+	
+	@OneToOne(mappedBy = "boulder")
+	private BoulderScore score;
 	
 	public void setCustomPhoto(String customPhoto) {
 		var imageDetails = ImageHelper.parseDataUrl(customPhoto);

@@ -18,17 +18,14 @@
 		<main class="container">
 			<nav>
 				<ul>
-					<li><strong>Pan</strong></li>
+					<li><a href="<@spring.url '/boulders' />">blocs</a></li>
+					<#if currentUser??>
+						<li><a href="<@spring.url '/scores' />">classement</a></li>
+					</#if>
 				</ul>
 				<ul>
-					<li><a href="<@spring.url '/boulders' />">Les blocs</a></li>
 					<#if currentUser??>
-						<li>${currentUser.username} (<a href="#" onclick="logout()" style="font-style: italic;">Se deconnecter</a>)
-							<form style="display: none;" id="logoutForm" action="/signout" method="POST">
-								<@f.csrf />
-								<button type="submit">se deconnecter</button>
-							</form>
-						</li>
+						<li><a href="#" id="userDialogOpenBtn" class="outline secondary">${currentUser.username}</a></li>
 					<#else>
 						<li><a href="/signin">Se connecter</a></li>
 					</#if>
@@ -36,6 +33,24 @@
 			</nav>
 			<#nested />
 		</main>
+		<#if currentUser??>
+			<dialog id="userDialog">
+				<article>
+					<h3>${currentUser.username}</h3>
+					<p>
+						Votre score est de ${currentUser.score.score} !
+					</p>
+					<footer>
+						<a href="#" id="userDialogBackBtn" role="button" class="secondary">Retour</a>
+						<a href="#" role="button" id="logoutBtn">Se deconnecter</a>
+						<form style="display: none;" id="logoutForm" action="/signout" method="POST">
+							<@f.csrf />
+							<button type="submit">se deconnecter</button>
+						</form>
+					</footer>
+				</article>
+			</dialog>
+		</#if>
 	</body>
 </html>
 </#macro>
