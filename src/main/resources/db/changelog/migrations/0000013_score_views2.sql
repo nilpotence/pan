@@ -8,7 +8,7 @@ FROM (
 	FROM pan.boulder b
 	LEFT JOIN pan.tick t ON b.id = t.boulder_id
   	GROUP BY b.id
-  	);
+  	) AS q;
 
 CREATE OR REPLACE VIEW pan.app_user_score AS
 SELECT *, rank() OVER (ORDER BY score desc)
@@ -20,7 +20,4 @@ FROM (
 	LEFT JOIN pan.tick t ON t.app_user_id = u.id
 	LEFT JOIN pan.boulder_score bscore ON bscore.boulder_id = t.boulder_id
 	GROUP BY u.id
-	);
-
-	
-
+	) AS q;
