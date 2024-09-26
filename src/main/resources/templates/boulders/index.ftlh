@@ -26,7 +26,7 @@
 		</thead>
 		<tbody>
 			<#list boulders.iterator() as b>
-				<tr>
+				<tr <#if currentUser?? && currentUser.role == 'ADMIN' && b.obsoleteCount gt 0>style="background: rgba(255, 0, 0, 0.2);"</#if>>
 					<td><strong>${b.name}</strong> - <i>${b.estimatedGrade}</i></td>
 					<td>
 						<a href="boulders/${b.id}">Voir</a>

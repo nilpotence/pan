@@ -1,6 +1,9 @@
 class DeleteDialog {
 	constructor() {
 		this.dialog = document.querySelector('#confirmDeleteDialog')
+		
+		if (!this.dialog) return 
+		
 		this.deleteForm = this.dialog.querySelector("#deleteForm")
 		
 		this.cancelAction = this.dialog.querySelector("#cancelDeleteAction")	
@@ -54,6 +57,52 @@ class TickDialog {
 		this.tickForm.submit()	
 	}
 }
+
+class ObsoleteDialog {
+	constructor() {
+		this.dialog = document.querySelector("#obsoleteDialog")
+		 
+		if (!this.dialog) return;
+		
+		this.obsoleteForm = this.dialog.querySelector("form#obsoleteForm")
+		this.cancelAction = this.dialog.querySelector("#cancelObsoleteAction")
+		this.confirmAction = this.dialog.querySelector("#confirmObsoleteAction")
+
+		this.unobsoleteAction = this.dialog.querySelector("#unobsoleteAction")
+		this.unobsoleteForm = this.dialog.querySelector("form#unobsoleteForm")
+
+		this.cancelAction.addEventListener('click', () => this.cancel())
+		this.confirmAction.addEventListener('click', () => this.confirm())
+		this.unobsoleteAction.addEventListener('click', () => this.unobsolete())
+	}
+	
+	open () {
+		this.dialog.open = true
+	}
+	
+	cancel () {
+		this.dialog.open = false
+	}
+
+	unobsolete () {
+		if (!this.dialog.open) return
+		
+		this.unobsoleteForm.submit()	
+	}
+	
+	confirm () {
+		if (!this.dialog.open) return
+		
+		this.obsoleteForm.submit()	
+	}
+}
+
+const obsoleteDialog = new ObsoleteDialog()
+
+document.querySelectorAll(".obsolete-boulder-action").forEach(elem => {
+	elem.addEventListener('click', () => obsoleteDialog.open(elem))
+})
+
 
 const deleteDialog = new DeleteDialog()
 

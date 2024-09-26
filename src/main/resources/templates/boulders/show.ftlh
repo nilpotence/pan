@@ -2,7 +2,7 @@
 <#import '/common/form.ftlh' as f />
 
 <@layout.main title=boulder.name>
-	<h1 style="display: flex; justify-content: space-between; align-items: center;">
+	<h1 style="display: flex; justify-content: space-between; align-items: center; font-size: 1.3em;">
 		${boulder.name} - ${boulder.estimatedGrade} <#if tick?? && tick.appUser??>&#10003;</#if>
 		<div style="display: flex;">
 			<@auth.ifCanUpdate boulder>
@@ -26,25 +26,7 @@
 	
 	<p>${boulder.comment!}</p>
 	
-	<#if tick??>	
-		<#if tick.appUser??>
-			<div>
-				<p>
-					enchainé le 
-					<strong>${tick.createdAt.format('dd/MM/YYYY')}</strong>
-					<#if tick.comment?has_content>
-					 	: <span style="font-style: italic;">&laquo;${tick.comment}&raquo;</span>
-					</#if>	
-					<#if tick.estimatedGrade?has_content>
-						(${tick.estimatedGrade})
-					</#if>
-					 - <a href="#" class="edit-tick-action">modifier...</a>
-				</p>
-			</div>
-		<#else>
-			<p><a href="#" class="edit-tick-action">j'ai enchainé...</a></p>
-		</#if>
-	</#if>
+	
 	
 	<svg 
 		viewBox="${bbox.x?floor?c} ${bbox.y?floor?c} ${bbox.width?floor?c} ${bbox.height?floor?c}"
@@ -88,9 +70,33 @@
 		</#list>
 	</svg>	
 	
+	<#if currentUser??>
+		<p style="font-size: 0.9em; text-align: right;">
+			<a href="#" class="obsolete-boulder-action">Signaler un bloc obsolète...</a>
+		</p>
+	</#if>
+	
 	<div id="ticklist" style="margin-top: 40px;">
-		<h3>&#128170; répetitions &#128170;</h3>
-		
+		<h2	style="font-size: 1.0em;">&#128170; répetitions &#128170;</h2>
+		<#if tick??>	
+			<#if tick.appUser??>
+				<div>
+					<p style="font-size: 0.9em">
+						enchainé le 
+						<strong>${tick.createdAt.format('dd/MM/YYYY')}</strong>
+						<#if tick.comment?has_content>
+						 	: <span style="font-style: italic;">&laquo;${tick.comment}&raquo;</span>
+						</#if>	
+						<#if tick.estimatedGrade?has_content>
+							(${tick.estimatedGrade})
+						</#if>
+						 - <a href="#" class="edit-tick-action">modifier...</a>
+					</p>
+				</div>
+			<#else>
+				<p><a href="#" class="edit-tick-action">j'ai enchainé...</a></p>
+			</#if>
+		</#if>
 			
 		<table>
 			<thead>
@@ -145,22 +151,52 @@
 		</dialog>
 	</#if>
 	
-	<dialog id="confirmDeleteDialog">
-		<article>
-			<h3>Supprimer le bloc ${boulder.name}</h3>
-			<p>
-				Êtes vous sur de vouloir supprimer le bloc ${boulder.name} ?
-				Attention, Le bloc ne pourra pas être restoré.
-			</p>
-			<footer>
-				<a href="#" id="cancelDeleteAction" role="button" class="secondary">Annuler</a>
-				<a href="#" id="confirmDeleteAction" role="button">Confirmer</a>
-			</footer>
-		</article>
-		<form id="deleteForm" action="/boulders/${boulder.id}" method="POST">
-			<@f.csrf />
-			<input type="hidden" name="_method" value="DELETE" />
-		</form>
-	</dialog>
+	<#if currentUser??>
+		<dialog id="confirmDeleteDialog">
+			<article>
+				<h3>Supprimer le bloc ${boulder.name}</h3>
+				<p>
+					Êtes vous sur de vouloir supprimer le bloc ${boulder.name} ?
+					Attention, Le bloc ne pourra pas être restoré.
+				</p>
+				<footer>
+					<a href="#" id="cancelDeleteAction" role="button" class="secondary">Annuler</a>
+					<a href="#" id="confirmDeleteAction" role="button">Confirmer</a>
+				</footer>
+			</article>
+			<form id="deleteForm" action="/boulders/${boulder.id}" method="POST">
+				<@f.csrf />
+				<input type="hidden" name="_method" value="DELETE" />
+			</form>
+		</dialog>
+	
+		<dialog id="obsoleteDialog">
+			<article>
+				<h3>Ce bloc est obsolète ?</h3>
+				<p>
+					Des prises ont changées et ce bloc est devenu obsolète ? Signalez le,
+					Il sera supprimé par un modérateur !
+				</p>
+				<footer>
+					<a href="#" id="cancelObsoleteAction" role="button" class="secondary">Annuler</a>
+					<#if currentUser.role == 'ADMIN'>
+						<a href="#" id="unobsoleteAction" role="button" class="secondary">Pas obsolète</a>
+					</#if>
+					<a href="#" id="confirmObsoleteAction" role="button">Confirmer</a>
+				</footer>
+			</article>
+			<#if currentUser.role == 'ADMIN'>
+				<form id="unobsoleteForm" action="/boulders/${boulder.id}/unobsolete" method="POST">
+					<@f.csrf />
+					<input type="hidden" name="_method" value="PUT" />
+				</form>
+			</#if>
+			<form id="obsoleteForm" action="/boulders/${boulder.id}/obsolete" method="POST">
+				<@f.csrf />
+				<input type="hidden" name="_method" value="PUT" />
+			</form>
+		</dialog>
+	</#if>
+	
 	<script type="text/javascript" src="/bundle/boulders/show.js"></script>
 </@layout.main>

@@ -27,3 +27,5 @@ databaseChangeLog:
       file: classpath*:db/changelog/migrations/0000013_score_views2.sql
   - include:
       file: classpath*:db/changelog/migrations/0000014_boulder_comment.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000015_obsolete_boulder.sql

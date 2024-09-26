@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="/icons/css/pen.css" />
 		<link rel="stylesheet" href="/icons/css/arrow-left.css" />
 		<link rel="stylesheet" href="/icons/css/arrow-right.css" />
+		<link rel="stylesheet" href="/icons/css/danger.css" />
 		<script type="application/javascript" src="<@spring.url '/bundle/index.js' />"></script>
 		<title>${title}</title>
 	</head>

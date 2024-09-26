@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -91,6 +92,29 @@ public class BoulderController {
 		
 		
 		return "boulders/show";
+	}
+	
+	@PutMapping("/boulders/{id}/obsolete")
+	@Transactional
+	public String obsolete(@PathVariable("id") Boulder boulder) {
+		if (authService.getCurrentUser() == null) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+		}
+
+		boulder.setObsoleteCount(boulder.getObsoleteCount() + 1);
+		boulderRepository.save(boulder);
+		
+		return "redirect:/boulders";
+	}
+	
+	@Secured("ROLE_ADMIN")
+	@PutMapping("/boulders/{id}/unobsolete")
+	@Transactional
+	public String unobsolete(@PathVariable("id") Boulder boulder) {
+		boulder.setObsoleteCount(0);
+		boulderRepository.save(boulder);
+		
+		return "redirect:/boulders/{id}";
 	}
 	
 	@DeleteMapping("/boulders/{id}")

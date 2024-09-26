@@ -1,0 +1,1 @@
+ALTER TABLE pan.boulder ADD COLUMN obsolete_count INTEGER DEFAULT 0;

@@ -49,6 +49,9 @@ public class Boulder extends PanEntity {
 	@Column(nullable = true)
 	private String comment;
 	
+	@Column(nullable = false)
+	private int obsoleteCount = 0;
+	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	private AppUser createdBy;
 	
