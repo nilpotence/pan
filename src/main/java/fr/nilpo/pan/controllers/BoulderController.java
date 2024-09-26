@@ -149,6 +149,7 @@ public class BoulderController {
 		
 		boulder.setName(updatedBoulder.getName());
 		boulder.setEstimatedGrade(updatedBoulder.getEstimatedGrade());
+		boulder.setComment(updatedBoulder.getComment());
 		boulder.setHolds(updatedBoulder.getHolds());
 		boulder.setRawCustomPhoto(updatedBoulder.getRawCustomPhoto());
 		boulder.setCustomPhotoWidth(updatedBoulder.getCustomPhotoWidth());

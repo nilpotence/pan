@@ -1,11 +1,13 @@
 package fr.nilpo.pan.models.boulders;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -44,6 +46,9 @@ public class Boulder extends PanEntity {
 	@Column(nullable = false)
 	private int customPhotoHeight = 0;
 	
+	@Column(nullable = true)
+	private String comment;
+	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	private AppUser createdBy;
 	
@@ -55,8 +60,11 @@ public class Boulder extends PanEntity {
 	
 	private LocalDateTime lastUpdatedAt;
 	
-	@OneToOne(mappedBy = "boulder")
+	@OneToOne(optional = false, mappedBy = "boulder")
 	private BoulderScore score;
+	
+	@OneToMany(mappedBy = "boulder")
+	private List<Tick> ticks;
 	
 	public void setCustomPhoto(String customPhoto) {
 		var imageDetails = ImageHelper.parseDataUrl(customPhoto);

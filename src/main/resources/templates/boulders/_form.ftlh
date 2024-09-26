@@ -3,6 +3,7 @@
 <#macro editBoulder action method actionLabel>
 	<@f.form path="boulder" action=action method=method>
 		<@f.input path="boulder.name" label="" type="text" placeholder="Nom du bloc" /> 
+		<@f.input path="boulder.comment" label="" type="text" placeholder="Commentaire" /> 
 		<#assign grades = [] />
 		<#list 3..8 as gradeNum>
 			<#list ['a', 'b', 'c'] as gradeLetter>

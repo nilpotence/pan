@@ -22,7 +22,7 @@ public class AppUserScore {
 	private UUID appUserId;
 	
 	@JoinColumn(referencedColumnName = "id", insertable = false, name = "app_user_id")
-	@OneToOne
+	@OneToOne(optional = false)
 	private AppUser user;
 	
 	private long score;

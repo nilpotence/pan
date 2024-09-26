@@ -56,7 +56,7 @@ public class AppUser implements UserDetails {
 	@Enumerated(EnumType.STRING)
 	private Role role;
 	
-	@OneToOne(mappedBy = "user")
+	@OneToOne(optional = false, mappedBy = "user")
 	private AppUserScore score;
 	
 	@Override

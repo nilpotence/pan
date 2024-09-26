@@ -1,0 +1,1 @@
+ALTER TABLE pan.boulder ADD COLUMN comment TEXT;

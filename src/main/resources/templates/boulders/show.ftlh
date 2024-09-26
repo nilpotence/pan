@@ -24,7 +24,9 @@
 		</div>
 	</h1>
 	
-	<#if tick??>
+	<p>${boulder.comment!}</p>
+	
+	<#if tick??>	
 		<#if tick.appUser??>
 			<div>
 				<p>

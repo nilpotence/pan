@@ -23,7 +23,7 @@ public class BoulderScore {
 	private UUID boulderId;
 	
 	@JoinColumn(referencedColumnName = "id", insertable = false, name = "boulder_id")
-	@OneToOne
+	@OneToOne(optional = false)
 	private Boulder boulder;
 
 	private long nb_ticks;
