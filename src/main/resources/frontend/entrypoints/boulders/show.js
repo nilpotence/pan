@@ -83,7 +83,9 @@ ready(() => {
 
 			this.cancelAction.addEventListener('click', () => this.cancel())
 			this.confirmAction.addEventListener('click', () => this.confirm())
-			this.unobsoleteAction.addEventListener('click', () => this.unobsolete())
+			if (this.unobsoleteAction !== null) {
+				this.unobsoleteAction.addEventListener('click', () => this.unobsolete())
+			}
 		}
 	
 		open () {
@@ -97,7 +99,9 @@ ready(() => {
 		unobsolete () {
 			if (!this.dialog.open) return
 		
-			this.unobsoleteForm.submit()	
+			if (this.unobsoleteForm !== null) {
+				this.unobsoleteForm.submit()
+			}	
 		}
 	
 		confirm () {
