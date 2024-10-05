@@ -5,10 +5,15 @@ import '@picocss/pico'
 import "./index.css"
 
 import ready from "../components/ready.js"
+import logError from "../components/send_client_error.js"
 
 import dialogPolyfill from 'dialog-polyfill'
 
 window.dialogPolyfill = dialogPolyfill
+
+window.onerror = function (message, url, lineNumber) {
+	logError("[url="+url+", line="+lineNumber+"] " + message)
+}
 
 ready(() => {
 	const userDialog = document.querySelector("#userDialog")
