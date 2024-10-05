@@ -4,6 +4,8 @@ class DeleteDialog {
 		
 		if (!this.dialog) return 
 		
+		dialogPolyfill.registerDialog(this.dialog)
+		
 		this.deleteForm = this.dialog.querySelector("#deleteForm")
 		
 		this.cancelAction = this.dialog.querySelector("#cancelDeleteAction")	
@@ -14,11 +16,11 @@ class DeleteDialog {
 	}
 	
 	open () {
-		this.dialog.open = true
+		this.dialog.show()
 	}
 	
 	cancel () {
-		this.dialog.open = false
+		this.dialog.close()
 	}
 	
 	confirm () {
@@ -33,6 +35,8 @@ class TickDialog {
 		this.dialog = document.querySelector("#tickDialog")
 		
 		if (!this.dialog) return
+
+		dialogPolyfill.registerDialog(this.dialog)
 		
 		this.tickForm = this.dialog.querySelector("form#tick")
 
@@ -44,11 +48,11 @@ class TickDialog {
 	}
 	
 	open () {
-		this.dialog.open = true
+		this.dialog.show()
 	}
 	
 	cancel () {
-		this.dialog.open = false
+		this.dialog.close()
 	}
 	
 	confirm () {
@@ -63,6 +67,8 @@ class ObsoleteDialog {
 		this.dialog = document.querySelector("#obsoleteDialog")
 		 
 		if (!this.dialog) return;
+
+		dialogPolyfill.registerDialog(this.dialog)
 		
 		this.obsoleteForm = this.dialog.querySelector("form#obsoleteForm")
 		this.cancelAction = this.dialog.querySelector("#cancelObsoleteAction")
@@ -77,11 +83,11 @@ class ObsoleteDialog {
 	}
 	
 	open () {
-		this.dialog.open = true
+		this.dialog.show()
 	}
 	
 	cancel () {
-		this.dialog.open = false
+		this.dialog.close()
 	}
 
 	unobsolete () {

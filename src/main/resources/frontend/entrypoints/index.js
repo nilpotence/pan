@@ -1,14 +1,21 @@
 //import * as Turbo from "@hotwired/turbo"
-import '@picocss/pico'
 
+import 'dialog-polyfill/dist/dialog-polyfill.css'
+import '@picocss/pico'
 import "./index.css"
 
 import ready from "../components/ready.js"
+
+import dialogPolyfill from 'dialog-polyfill'
+
+window.dialogPolyfill = dialogPolyfill
 
 ready(() => {
 	const userDialog = document.querySelector("#userDialog")
 	
 	if (!userDialog) return 
+	
+	dialogPolyfill.registerDialog(userDialog)
 
 	const userDialogOpenBtn = document.querySelector("#userDialogOpenBtn")
 	const userDialogBackBtn = userDialog.querySelector("#userDialogBackBtn")
@@ -17,7 +24,7 @@ ready(() => {
 	
 	logoutBtn.addEventListener('click', evt => logoutForm.submit())
 	
-	userDialogOpenBtn.addEventListener('click', evt => userDialog.open = true)
-	userDialogBackBtn.addEventListener('click', evt => userDialog.open = false)
+	userDialogOpenBtn.addEventListener('click', evt => userDialog.show())
+	userDialogBackBtn.addEventListener('click', evt => userDialog.close())
 		
 })
