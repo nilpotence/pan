@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import fr.nilpo.pan.config.AuthService;
 import fr.nilpo.pan.models.boulders.Boulder;
+import fr.nilpo.pan.models.boulders.BoulderIndexData;
 import fr.nilpo.pan.models.boulders.BoulderRepository;
 import fr.nilpo.pan.models.boulders.DefaultPhoto;
 import fr.nilpo.pan.models.boulders.DefaultPhotoRepository;
@@ -52,7 +54,9 @@ public class BoulderController {
 	
 	@GetMapping("/boulders")
 	public String index(Model model, @SortDefault(sort = {"createdAt"}, direction = Direction.DESC) Pageable pageable) {
-		Page<Boulder> boulders = boulderRepository.findAll(pageable);
+        var user = authService.getCurrentUser();
+
+		Page<BoulderIndexData> boulders = boulderRepository.findAll(user, pageable);
 		
 		var currentSort = pageable.getSort().stream()
 			.map(o -> o.getProperty() + "," + o.getDirection().toString())

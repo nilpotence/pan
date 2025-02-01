@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +33,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 					.antMatchers("/boulders/new", "/boulders/*/edit")
 					.authenticated()
-					.antMatchers(HttpMethod.GET, "/", "/boulders", "/boulders/**", "/img/**", "/bundle/**", "/icons/**")
+					.antMatchers(HttpMethod.GET, "/", "/boulders", "/boulders/**","/api/errors", "/img/**", "/bundle/**", "/icons/**")
 					.permitAll()
 					.antMatchers("/signin", "/signup")
 					.permitAll()
@@ -52,7 +53,6 @@ public class SecurityConfig {
 				.key(REMEMBER_ME_KEY)
 				.userDetailsService(usersDetailsService);
 				
-		
 		return http.build();
 	}
 	

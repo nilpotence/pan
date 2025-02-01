@@ -3,6 +3,9 @@ package fr.nilpo.pan.controllers;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +17,7 @@ public class ClientErrorController {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@GetMapping(path = "/api/errors", produces = "application/json")
-	public String logError(String message) {
+	public String logError(String message, HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 			var decoded = new String(Base64.getDecoder().decode(message), StandardCharsets.UTF_8);

@@ -13,6 +13,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.annotations.Filter;
+
 import fr.nilpo.pan.models.PanEntity;
 import fr.nilpo.pan.models.users.AppUser;
 import lombok.Getter;
@@ -68,7 +70,7 @@ public class Boulder extends PanEntity {
 	
 	@OneToMany(mappedBy = "boulder")
 	private List<Tick> ticks;
-	
+
 	public void setCustomPhoto(String customPhoto) {
 		var imageDetails = ImageHelper.parseDataUrl(customPhoto);
 		
