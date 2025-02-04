@@ -99,35 +99,45 @@
 			</#if>
 		</#if>
 
-        <p title="Estimations de la cotation" style="font-size: 0.9em; text-align: center;">
-        &#x1F4CA;&nbsp;
-            <#list gradeStats as gs>
-                <span style="font-weight: bold;">${gs.grade} :</span>
-                <span style="font-style: italic;">${gs.count/ticks.getTotalElements()*100} %</span>
-                <#sep>,&nbsp;</#sep>
-            </#list>
-        &nbsp;&#x1F4CA;
-        </p>	
-		<table>
-			<thead>
-				<tr>
-					<th title="grimpeur.euse">&#129495;</th>
-					<th title="commentaire">&#128172;</th>
-					<th title="cotation estimée">&#128170;</th>
-					<th title="date de l'enchainement">&#128197;</th>
-				</tr>
-			</thead>
-			<tbody>
-				<#list ticks.iterator() as t>
-					<tr>
-						<td>${t.appUser.username}</td>
-						<td>${t.comment}</td>
-						<td>${t.estimatedGrade!""}</td>
-						<td>${t.createdAt.format('dd/MM/YY')}</td>
-					</tr>	
-				</#list>	
-			</tbody>
-		</table>
+        <#if gradeStatsCount gt 0>
+            <p title="Estimations de la cotation" style="font-size: 0.9em; text-align: center;">
+                &#x1F4CA;&nbsp;
+                <#list gradeStats as gs>
+                    <span style="font-weight: bold;">${gs.grade} :</span>
+                    <span style="font-style: italic;">${(gs.count/gradeStatsCount*100)?floor} %</span>
+                    <#sep>,&nbsp;</#sep>
+                </#list>
+                &nbsp;&#x1F4CA;
+            </p>	
+        </#if>
+
+        <#if ticks.getNumberOfElements() lte 0>
+            <p style="font-style: italic; text-align: center;">
+                Aucune répétition pour l'instant<br />
+                ¯\_(ツ)_/¯
+            </p>
+        <#else>
+            <table>
+                <thead>
+                    <tr>
+                        <th title="grimpeur.euse">&#129495;</th>
+                        <th title="commentaire">&#128172;</th>
+                        <th title="cotation estimée">&#128170;</th>
+                        <th title="date de l'enchainement">&#128197;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <#list ticks.iterator() as t>
+                        <tr>
+                            <td>${t.appUser.username}</td>
+                            <td>${t.comment}</td>
+                            <td>${t.estimatedGrade!""}</td>
+                            <td>${t.createdAt.format('dd/MM/YY')}</td>
+                        </tr>	
+                    </#list>	
+                </tbody>
+            </table>
+        </#if>
 	</div>
 	
 	<#if tick??>

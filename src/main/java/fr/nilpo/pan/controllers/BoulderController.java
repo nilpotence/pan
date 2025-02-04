@@ -90,8 +90,10 @@ public class BoulderController {
 
         var gradeStats = tickRepository.getGradeStatsByBoulder(b);
 
-        for(var gs : gradeStats) {
-            System.out.println(gs.getGrade() + " : " + gs.getCount());
+        long gradeStatsCount = 0;
+
+        for (var gs : gradeStats) {
+            gradeStatsCount += gs.getCount();
         }
 		
 		var bbox = ShowBoulderHelper.getBoulderBoundingBox(b);
@@ -99,6 +101,7 @@ public class BoulderController {
 		model.addAttribute("boulder", b);
 		model.addAttribute("ticks", ticks);
 		model.addAttribute("bbox", bbox);
+        model.addAttribute("gradeStatsCount", gradeStatsCount);
         model.addAttribute("gradeStats", gradeStats);
 		
 		
