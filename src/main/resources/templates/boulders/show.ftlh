@@ -78,6 +78,7 @@
 	
 	<div id="ticklist" style="margin-top: 40px;">
 		<h2	style="font-size: 1.0em;">&#128170; répetitions &#128170;</h2>
+
 		<#if tick??>	
 			<#if tick.appUser??>
 				<div>
@@ -97,13 +98,23 @@
 				<p><a href="#" class="edit-tick-action">j'ai enchainé...</a></p>
 			</#if>
 		</#if>
-			
+
+        <p title="Estimations de la cotation" style="font-size: 0.9em; text-align: center;">
+        &#x1F4CA;&nbsp;
+            <#list gradeStats as gs>
+                <span style="font-weight: bold;">${gs.grade} :</span>
+                <span style="font-style: italic;">${gs.count/ticks.getTotalElements()*100} %</span>
+                <#sep>,&nbsp;</#sep>
+            </#list>
+        &nbsp;&#x1F4CA;
+        </p>	
 		<table>
 			<thead>
 				<tr>
-					<th>grimpeur.euse</th>
-					<th>commentaire</th>
-					<th>date</th>
+					<th title="grimpeur.euse">&#129495;</th>
+					<th title="commentaire">&#128172;</th>
+					<th title="cotation estimée">&#128170;</th>
+					<th title="date de l'enchainement">&#128197;</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -111,7 +122,8 @@
 					<tr>
 						<td>${t.appUser.username}</td>
 						<td>${t.comment}</td>
-						<td>${t.createdAt.format('dd/MM/YYYY')}</td>
+						<td>${t.estimatedGrade!""}</td>
+						<td>${t.createdAt.format('dd/MM/YY')}</td>
 					</tr>	
 				</#list>	
 			</tbody>

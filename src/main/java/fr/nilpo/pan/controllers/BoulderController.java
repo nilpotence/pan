@@ -87,12 +87,19 @@ public class BoulderController {
 		
 		Page<Tick> ticks = tickRepository
 				.findAllByBoulder(b, pageable);
+
+        var gradeStats = tickRepository.getGradeStatsByBoulder(b);
+
+        for(var gs : gradeStats) {
+            System.out.println(gs.getGrade() + " : " + gs.getCount());
+        }
 		
 		var bbox = ShowBoulderHelper.getBoulderBoundingBox(b);
 		
 		model.addAttribute("boulder", b);
 		model.addAttribute("ticks", ticks);
 		model.addAttribute("bbox", bbox);
+        model.addAttribute("gradeStats", gradeStats);
 		
 		
 		return "boulders/show";
