@@ -4,7 +4,7 @@
 <@layout.main title=boulder.name>
 	<h1 style="display: flex; justify-content: space-between; align-items: center; font-size: 1.3em;">
 		${boulder.name} - ${boulder.estimatedGrade} <#if tick?? && tick.appUser??>&#10003;</#if>
-		<div style="display: flex;">
+        <div style="display: flex;">
 			<@auth.ifCanUpdate boulder>
 				<a 
 					href="#"
@@ -23,11 +23,12 @@
 			</@auth.ifCanUpdate>
 		</div>
 	</h1>
+
 	
 	<p>${boulder.comment!}</p>
 	
 	
-	
+    <p style="font-size: 0.9em; margin-bottom: 0.1em; text-align: right;">Ouvreur : ${boulder.createdBy.username}</p>
 	<svg 
 		viewBox="${bbox.x?floor?c} ${bbox.y?floor?c} ${bbox.width?floor?c} ${bbox.height?floor?c}"
 		style="
