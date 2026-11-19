@@ -2,9 +2,8 @@ package fr.nilpo.pan.models.boulders;
 
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,9 +42,15 @@ public class ShowBoulderHelper {
 		}
 	}
 	
-	public static Hold[] parseHolds(String holds) throws JsonMappingException, JsonProcessingException {
-		var mapper = new ObjectMapper();
-		return mapper.readValue(holds, Hold[].class);
+	// Jackson 3 ignores unknown properties by default; the holds JSON is
+	// user input stored as-is, so keep rejecting anything but {x, y}.
+	private static final JsonMapper MAPPER = JsonMapper.builder()
+			.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+			.build();
+
+	/** @throws tools.jackson.core.JacksonException (unchecked) if the JSON is invalid */
+	public static Hold[] parseHolds(String holds) {
+		return MAPPER.readValue(holds, Hold[].class);
 	}
 	
 	@Data
