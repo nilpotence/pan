@@ -28,4 +28,19 @@ public interface PhotoRepository extends JpaRepository<Photo, String> {
 		nativeQuery = true
 	)
 	public int deleteIfUnused(String id);
+
+	/**
+	 * Photos uploaded with a form that was never submitted successfully
+	 * (validation error, then abandoned): stored, but referenced by nothing.
+	 * Compared with the database clock, which also set created_at (DEFAULT
+	 * now()), so the JVM's time zone doesn't matter.
+	 */
+	@Modifying
+	@Query(
+		value = "DELETE FROM pan.photo p WHERE p.created_at < now() - make_interval(hours => :hours) " +
+				"AND NOT EXISTS (SELECT 1 FROM pan.boulder b WHERE b.photo_id = p.id) " +
+				"AND NOT EXISTS (SELECT 1 FROM pan.default_photo d WHERE d.photo_id = p.id)",
+		nativeQuery = true
+	)
+	public int deleteUnusedOlderThan(int hours);
 }
