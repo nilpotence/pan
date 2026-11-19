@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,8 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 import jakarta.servlet.DispatcherType;
@@ -63,12 +67,32 @@ public class SecurityConfig {
 			.headers(headers -> headers
 					.contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
 					.referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.SAME_ORIGIN))
+					// Pages are revalidated on every navigation, but not
+					// "no-store" (Spring Security's default): no-store keeps
+					// them out of the back/forward cache, so "back" reloaded
+					// the whole page. Responses that set their own
+					// Cache-Control (static files, photos) keep it.
+					.cacheControl(cacheControl -> cacheControl.disable())
+					.addHeaderWriter((request, response) -> {
+						if (!response.containsHeader(HttpHeaders.CACHE_CONTROL)) {
+							response.setHeader(HttpHeaders.CACHE_CONTROL, "private, no-cache");
+						}
+					})
 			)
 			.securityContext(securityContext -> securityContext
 					.securityContextRepository(securityContextRepository)
 			)
+			// No session for anonymous visitors until one is needed (CSRF
+			// token of a form, saved request before /signin).
+			// Caveat: the session cookie must be sent before the response is
+			// committed (~8 KB of output). An anonymous page must not render
+			// a form (<@f.csrf />) after a large amount of HTML, or Tomcat
+			// fails with "Cannot create a session after the response has
+			// been committed". Logged-in users already have a session, so
+			// only anonymous pages with forms matter (today /signin and
+			// /signup, both small).
 			.sessionManagement(sessionManagement -> sessionManagement
-					.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 			)
 			.authorizeHttpRequests(authorize -> authorize
 					// Since Spring Security 6 the rules also apply to error
@@ -108,6 +132,10 @@ public class SecurityConfig {
 			.logout(logout -> logout
 					.logoutUrl("/signout")
 					.logoutSuccessUrl("/")
+					// Pages can now stay in the browser cache (see
+					// cacheControl above): drop them on logout, so that
+					// "back" doesn't show a page of the logged-out user.
+					.addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(Directive.CACHE)))
 					.permitAll()
 			)
 			.rememberMe(rememberMe -> rememberMe
