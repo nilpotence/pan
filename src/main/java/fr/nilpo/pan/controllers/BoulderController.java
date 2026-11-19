@@ -2,6 +2,7 @@ package fr.nilpo.pan.controllers;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -53,6 +54,20 @@ public class BoulderController {
 	
 	@Autowired
 	private TickRepository tickRepository;
+
+	private static final Pattern GRADE = Pattern.compile("^[3-8][a-c]\\+{0,1}$");
+	static final int MAX_TICK_COMMENT_LENGTH = 1000;
+
+	/** 404 if the boulder doesn't exist, 403 if the current user may not modify it. */
+	private Boulder findUpdatable(UUID id) {
+		var boulder = boulderRepository
+				.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		if (!authService.canUpdate(boulder)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+		}
+		return boulder;
+	}
 
 	/**
 	 * Only user-editable fields are bound onto a submitted Boulder. In
@@ -141,13 +156,19 @@ public class BoulderController {
 	
 	@PutMapping("/boulders/{id}/obsolete")
 	@Transactional
-	public String obsolete(@PathVariable("id") Boulder boulder) {
-		if (authService.getCurrentUser() == null) {
+	public String obsolete(@PathVariable("id") UUID boulderId) {
+		var user = authService.getCurrentUser();
+		if (user == null) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 		}
+		if (!boulderRepository.existsById(boulderId)) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
 
-		boulder.setObsoleteCount(boulder.getObsoleteCount() + 1);
-		boulderRepository.save(boulder);
+		// One vote per user: the count only moves when a new vote row is inserted.
+		if (boulderRepository.addObsoleteVote(user.getId(), boulderId) == 1) {
+			boulderRepository.incrementObsoleteCount(boulderId);
+		}
 		
 		return "redirect:/boulders";
 	}
@@ -155,19 +176,21 @@ public class BoulderController {
 	@Secured("ROLE_ADMIN")
 	@PutMapping("/boulders/{id}/unobsolete")
 	@Transactional
-	public String unobsolete(@PathVariable("id") Boulder boulder) {
-		boulder.setObsoleteCount(0);
-		boulderRepository.save(boulder);
+	public String unobsolete(@PathVariable("id") UUID boulderId) {
+		if (!boulderRepository.existsById(boulderId)) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+
+		boulderRepository.clearObsoleteVotes(boulderId);
+		boulderRepository.resetObsoleteCount(boulderId);
 		
 		return "redirect:/boulders/{id}";
 	}
 	
 	@DeleteMapping("/boulders/{id}")
 	@Transactional
-	public String delete(@PathVariable("id") Boulder boulder) {
-		if (!authService.canUpdate(boulder)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-		}
+	public String delete(@PathVariable("id") UUID id) {
+		var boulder = findUpdatable(id);
 		
 		boulderRepository.delete(boulder);
 		
@@ -175,10 +198,8 @@ public class BoulderController {
 	}
 	
 	@GetMapping(path = "/boulders/{id}/edit")
-	public String editForm(@PathVariable("id") Boulder boulder, Model model) {
-		if (!authService.canUpdate(boulder)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-		}
+	public String editForm(@PathVariable("id") UUID id, Model model) {
+		var boulder = findUpdatable(id);
 
 		var defaultPhoto = new DefaultPhoto();
 
@@ -195,10 +216,14 @@ public class BoulderController {
 	@PutMapping(path = "/boulders/{id}/edit")
 	@Transactional
 	public String edit(
-			@PathVariable("id") Boulder boulder, 
+			@PathVariable("id") UUID id, 
 			@ModelAttribute("boulder") @Valid Boulder updatedBoulder,
 			BindingResult results,
 			Model model) {
+		
+		// Authorization first: a non-owner must not get the edit form back
+		// just by submitting invalid data.
+		var boulder = findUpdatable(id);
 		
 		if (results.hasErrors()) {
 			var defaultPhoto = new DefaultPhoto();
@@ -210,10 +235,6 @@ public class BoulderController {
 			model.addAttribute("defaultPhoto", defaultPhoto);
 			
 			return "boulders/edit";
-		}
-		
-		if (!authService.canUpdate(boulder)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 		}
 		
 		boulder.setName(updatedBoulder.getName());
@@ -274,6 +295,21 @@ public class BoulderController {
 		boolean ticked,
 		Model model
 	){
+		if (!boulderRepository.existsById(boulderId)) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+
+		// The form only offers valid grades (or none) and a short comment:
+		// anything else is a forged request.
+		estimatedGrade = (estimatedGrade == null || estimatedGrade.isBlank()) ? null : estimatedGrade;
+		if (estimatedGrade != null && !GRADE.matcher(estimatedGrade).matches()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid grade");
+		}
+		comment = (comment == null || comment.isBlank()) ? null : comment.strip();
+		if (comment != null && comment.length() > MAX_TICK_COMMENT_LENGTH) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Comment too long");
+		}
+
 		var tick = tickRepository
 				.findById(new Tick.TickId(authService.getCurrentUser().getId(), boulderId))
 				.orElse(new Tick());

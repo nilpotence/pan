@@ -26,7 +26,7 @@
 	<#if spring.status.errorMessages?size gt 0>
 		<div class="pan-input--errors" <@id "error_" /> <@extraAttrs extras />>
 			<#list spring.status.errorMessages as message>
-				<span class="input-error">${message?no_esc}</span>
+				<span class="input-error">${message}</span>
 			</#list>
 		</div>
 	</#if>

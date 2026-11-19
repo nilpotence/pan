@@ -134,7 +134,7 @@
                     <#list ticks.iterator() as t>
                         <tr>
                             <td>${t.appUser.username}</td>
-                            <td>${t.comment}</td>
+                            <td>${t.comment!""}</td>
                             <td>${t.estimatedGrade!""}</td>
                             <td>${t.createdAt.format('dd/MM/YY')}</td>
                         </tr>	
