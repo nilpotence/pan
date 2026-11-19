@@ -51,21 +51,24 @@
 				<use  xlink:href="#holdClipPath" x=${h.x?c} y=${h.y?c}></use>
 			</#list>
 		</clipPath>
+		<#-- Photo drawn once, reused below: dimmed everywhere, full brightness inside the holds clip path. -->
 		<image
-			xlink:href="${boulder.darkCustomPhoto}"
-			x=0
-			y=0
-			width=${boulder.customPhotoWidth?c}
-			height=${boulder.customPhotoHeight?c}	
-		/>
-		<image
+			id="boulderPhoto"
 			xlink:href="${boulder.customPhoto}"
 			x="0"
 			y="0"
 			width="${boulder.customPhotoWidth?c}"
 			height="${boulder.customPhotoHeight?c}"
-			clip-path="url(#holdsClipPath)"
 		/>
+		<rect
+			x="0"
+			y="0"
+			width="${boulder.customPhotoWidth?c}"
+			height="${boulder.customPhotoHeight?c}"
+			fill="black"
+			fill-opacity="0.5"
+		/>
+		<use xlink:href="#boulderPhoto" clip-path="url(#holdsClipPath)" />
 		<#list bbox.holds as h>
 			<use class="hold" xlink:href="#hold" x=${h.x?c} y=${h.y?c}></use>
 		</#list>

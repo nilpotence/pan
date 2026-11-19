@@ -18,8 +18,10 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +53,35 @@ public class BoulderController {
 	
 	@Autowired
 	private TickRepository tickRepository;
+
+	/**
+	 * Only user-editable fields are bound onto a submitted Boulder. In
+	 * particular the photo dimensions are always derived from the decoded
+	 * image (setCustomPhoto), never taken from the request.
+	 */
+	@InitBinder("boulder")
+	public void initBoulderBinder(WebDataBinder binder) {
+		binder.setAllowedFields("name", "comment", "estimatedGrade", "customPhoto", "holds");
+	}
+
+	/**
+	 * Photo shown behind the holds canvas when a submitted form is
+	 * re-rendered with errors: the submitted photo if it was valid, else the
+	 * latest default photo.
+	 */
+	private DefaultPhoto formPhoto(byte[] rawPhoto, int width, int height) {
+		if (rawPhoto == null) {
+			return defaultPhotoRepository
+					.findFirstByOrderByCreatedAtDesc()
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+		}
+
+		var photo = new DefaultPhoto();
+		photo.setWidth(width);
+		photo.setHeight(height);
+		photo.setRawData(rawPhoto);
+		return photo;
+	}
 	
 	@GetMapping("/boulders")
 	public String index(Model model, @SortDefault(sort = {"createdAt"}, direction = Direction.DESC) Pageable pageable) {
@@ -220,13 +251,8 @@ public class BoulderController {
 			Model model) {
 		
 		if (bindingResult.hasErrors()) {
-			var defaultPhoto = new DefaultPhoto();
-
-			defaultPhoto.setWidth(boulder.getCustomPhotoWidth());
-			defaultPhoto.setHeight(boulder.getCustomPhotoHeight());
-			defaultPhoto.setRawData(boulder.getRawCustomPhoto());
-			
-			model.addAttribute("defaultPhoto", defaultPhoto);
+			model.addAttribute("defaultPhoto",
+					formPhoto(boulder.getRawCustomPhoto(), boulder.getCustomPhotoWidth(), boulder.getCustomPhotoHeight()));
 			
 			return "boulders/new";
 		}
