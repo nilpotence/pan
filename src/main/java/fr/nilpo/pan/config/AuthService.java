@@ -23,7 +23,7 @@ public class AuthService {
 	
 	public void authenticate(AppUser user) {
 		SecurityContextHolder.getContext().setAuthentication(
-			new UsernamePasswordAuthenticationToken(user, user.getPassword(), null)
+			new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities())
 		);
 	}
 	

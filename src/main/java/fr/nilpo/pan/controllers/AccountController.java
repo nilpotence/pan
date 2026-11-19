@@ -7,7 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -27,6 +29,16 @@ public class AccountController {
 	@Autowired
 	private AppUserRepository userRepository;
 	
+	/**
+	 * Only these fields may be bound from the request onto AppUser: binding
+	 * "id" would turn save() into a merge onto an existing account, and
+	 * "role" would allow self-promotion.
+	 */
+	@InitBinder("user")
+	public void initUserBinder(WebDataBinder binder) {
+		binder.setAllowedFields("username", "password", "passwordConfirmation");
+	}
+
 	@GetMapping("/signin")
 	public String signin(Model model) {
 		var user = new AppUser();
@@ -52,6 +64,7 @@ public class AccountController {
 			return "/account/signup";
 		}
 		
+		user.setId(null); // always create, never merge onto an existing account
 		user.setPassword(pwdEncoder.encode(user.getPassword()));
 		user.setPasswordConfirmation(user.getPassword());
 		user.setRole(AppUser.Role.USER);

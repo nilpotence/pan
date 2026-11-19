@@ -61,7 +61,7 @@ public class AppUser implements UserDetails {
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return AuthorityUtils.createAuthorityList(getRole().name());
+		return AuthorityUtils.createAuthorityList("ROLE_" + getRole().name());
 	}
 
 	@Override
