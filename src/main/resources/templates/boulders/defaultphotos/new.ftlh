@@ -6,9 +6,7 @@
 	<@f.form path="photo" action="/default-photos/new" method="POST">
 		<input id="imageFileInput" type="file" accept="image/*" capture="camera" />
 
-		<@f.inputWrapper path="photo.data">
-			<@f.hiddenInput path="photo.data" id="imageData" />
-		</@f.inputWrapper>
+		<input type="hidden" id="imageData" name="data" value="" />
 		
 		<canvas></canvas>
 

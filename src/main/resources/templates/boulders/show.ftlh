@@ -54,17 +54,17 @@
 		<#-- Photo drawn once, reused below: dimmed everywhere, full brightness inside the holds clip path. -->
 		<image
 			id="boulderPhoto"
-			xlink:href="${photoUrl}"
+			xlink:href="/photos/${boulder.photo.id}"
 			x="0"
 			y="0"
-			width="${boulder.customPhotoWidth?c}"
-			height="${boulder.customPhotoHeight?c}"
+			width="${boulder.photo.width?c}"
+			height="${boulder.photo.height?c}"
 		/>
 		<rect
 			x="0"
 			y="0"
-			width="${boulder.customPhotoWidth?c}"
-			height="${boulder.customPhotoHeight?c}"
+			width="${boulder.photo.width?c}"
+			height="${boulder.photo.height?c}"
 			fill="black"
 			fill-opacity="0.5"
 		/>

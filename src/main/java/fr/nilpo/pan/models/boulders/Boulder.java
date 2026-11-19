@@ -40,15 +40,9 @@ public class Boulder extends PanEntity {
 	@ValidHolds
 	private String holds;
 	
-	@NotNull(message = "Vous devez choisir une photo pour votre bloc !")
-	@Column(nullable = false)
-	private byte[] customPhoto;
-	
-	@Column(nullable = false)
-	private int customPhotoWidth = 0;
-	
-	@Column(nullable = false)
-	private int customPhotoHeight = 0;
+	/** Shared with other boulders using the same photo (see Photo). */
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	private Photo photo;
 	
 	@Column(nullable = true)
 	@Size(max = 1000, message = "Le commentaire ne doit pas dépasser 1000 caractères !")
@@ -73,24 +67,4 @@ public class Boulder extends PanEntity {
 	
 	@OneToMany(mappedBy = "boulder")
 	private List<Tick> ticks;
-
-	public void setCustomPhoto(String customPhoto) {
-		var imageDetails = ImageHelper.parseDataUrl(customPhoto);
-		
-		this.customPhoto = imageDetails.getData();
-		this.customPhotoWidth = imageDetails.getWidth();
-		this.customPhotoHeight = imageDetails.getHeight();
-	}
-	
-	public String getCustomPhoto() {
-		return ImageHelper.toDataURL(customPhoto);
-	}
-	
-	public void setRawCustomPhoto(byte[] customPhoto) {
-		this.customPhoto = customPhoto;
-	}
-	
-	public byte[] getRawCustomPhoto() {
-		return customPhoto;
-	}
 }

@@ -84,12 +84,6 @@ public class ImageHelper {
 		}
 	}
 
-	public static String toDataURL(byte[] data) {
-		if (data == null) return null;
-		var encodedData = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(data);
-		return encodedData;
-	}
-
 	// The JPEG writer can't encode an alpha channel (e.g. a PNG upload).
 	private static BufferedImage toRgb(BufferedImage img) {
 		if (!img.getColorModel().hasAlpha()) return img;

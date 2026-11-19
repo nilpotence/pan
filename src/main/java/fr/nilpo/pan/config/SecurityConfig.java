@@ -102,7 +102,7 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers("/boulders/new", "/boulders/*/edit")
 					.authenticated()
-					.requestMatchers(HttpMethod.GET, "/", "/boulders", "/boulders/**","/api/errors", "/img/**", "/bundle/**")
+					.requestMatchers(HttpMethod.GET, "/", "/boulders", "/boulders/**","/api/errors", "/img/**", "/bundle/**", "/photos/*")
 					.permitAll()
 					.requestMatchers("/signin", "/signup")
 					.permitAll()

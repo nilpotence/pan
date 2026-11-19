@@ -5,10 +5,10 @@ ready(() => {
 	const DEFAULT_WIDTH = 1600
 	let photoWidth = DEFAULT_WIDTH
 	let photoHeight = 0
-	let customPhotoData = null
 	
 	const boulderCanvas = document.querySelector("#boulderCanvas")
 	const customPhotoInput = document.querySelector("#customPhotoInput")
+	const photoIdInput = document.querySelector("#photoIdInput")
 
 	const customPhotoFileInput = document.querySelector("#customPhotoFileInput")
 	const customPhotoBtn = document.querySelector("#customPhotoBtn")
@@ -19,7 +19,10 @@ ready(() => {
 	})
 
 	initTakePhoto(1600, customPhotoFileInput, null, (data, width, height) => {
-		customPhotoInput.value = data	
+		// A new photo replaces the one referenced by id: it's the only case
+		// where the photo is uploaded.
+		customPhotoInput.value = data
+		photoIdInput.value = ""
 		boulderCanvas.style.backgroundImage = `url("${data}")`
 		boulderCanvas.width = width
 		boulderCanvas.height = height
@@ -35,9 +38,6 @@ ready(() => {
 		const canvas = document.querySelector("canvas#boulderCanvas")
 		const ctx = canvas.getContext('2d')	
 		const holdsInput = document.querySelector("#holdsInput")
-		
-		const currentPhotoData = canvas.style.backgroundImage.replace(/^url\(\"(.*)\"\)/, "$1");
-		customPhotoInput.value = currentPhotoData;
 
 		
 		let holds = []

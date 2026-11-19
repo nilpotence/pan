@@ -1,5 +1,5 @@
 <@layout.main title="photo par default">
 
-	<img src=${photo.data} />
+	<img src="/photos/${photo.photo.id}" />
 
 </@layout.main>

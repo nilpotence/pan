@@ -15,15 +15,18 @@
 		<@f.select path="boulder.estimatedGrade" options=grades placeholder="Cotation estimée" label="" required="true" />
 		<button id="customPhotoBtn" type="button">Prendre une photo personnalisée</button>
 		<input style="display: none;" id="customPhotoFileInput" type="file" accept="image/*" capture="camera" />
-		<@f.inputWrapper path="boulder.customPhoto">
-			<@f.hiddenInput path="boulder.customPhoto" id="customPhotoInput" />
+		<#-- The photo shown is sent back by id: only a new photo taken with
+		     customPhotoBtn is uploaded (customPhoto, filled by new.js). -->
+		<@f.inputWrapper path="boulder.photo">
+			<input type="hidden" id="photoIdInput" name="photoId" value="${formPhoto.id}" />
+			<input type="hidden" id="customPhotoInput" name="customPhoto" value="" />
 		</@f.inputWrapper>
 		<@f.inputWrapper path="boulder.holds">
 			<canvas
 				id="boulderCanvas"
-				style="background-image: url('${defaultPhoto.data}'); background-size: cover; width: 100%; user-select: none;"
-				width="${defaultPhoto.width?c}"
-				height="${defaultPhoto.height?c}">
+				style="background-image: url('/photos/${formPhoto.id}'); background-size: cover; width: 100%; user-select: none;"
+				width="${formPhoto.width?c}"
+				height="${formPhoto.height?c}">
 			</canvas>
 			<@f.hiddenInput path="boulder.holds" id="holdsInput" />
 		</@f.inputWrapper>

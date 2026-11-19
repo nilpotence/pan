@@ -17,14 +17,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import fr.nilpo.pan.config.AuthService;
 import fr.nilpo.pan.models.boulders.DefaultPhoto;
 import fr.nilpo.pan.models.boulders.DefaultPhotoRepository;
+import fr.nilpo.pan.models.boulders.PhotoService;
 
 @Controller
 @Secured("ROLE_ADMIN")
@@ -35,6 +36,9 @@ public class DefaultPhotoController {
 	
 	@Autowired
 	private AuthService authService;
+	
+	@Autowired
+	private PhotoService photoService;
 
 	@GetMapping("/default-photos")
 	public String index(
@@ -66,8 +70,9 @@ public class DefaultPhotoController {
 	
 	@DeleteMapping("/default-photos/{id}")
 	@Transactional
-	public String delete(@PathVariable("id") DefaultPhoto boulder) {
-		defaultPhotoRepository.delete(boulder);
+	public String delete(@PathVariable("id") DefaultPhoto defaultPhoto) {
+		defaultPhotoRepository.delete(defaultPhoto);
+		photoService.deleteIfUnused(defaultPhoto.getPhoto());
 		return "redirect:/default-photos";
 	}
 	
@@ -79,8 +84,14 @@ public class DefaultPhotoController {
 	
 	@PostMapping("/default-photos/new")
 	@Transactional
-	public String create(@ModelAttribute("photo") DefaultPhoto photo) {
+	public String create(@RequestParam("data") String data) {
+		var photo = new DefaultPhoto();
 		
+		try {
+			photo.setPhoto(photoService.save(data));
+		} catch (IllegalArgumentException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid photo");
+		}
 		photo.setCreatedBy(authService.getCurrentUser());
 		photo.setCreatedAt(LocalDateTime.now());
 		

@@ -1,6 +1,5 @@
 package fr.nilpo.pan.models.boulders;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -28,9 +27,16 @@ public interface BoulderRepository extends JpaRepository<Boulder, UUID>{
     )
     public Page<BoulderIndexData> findAll(AppUser user, Pageable pageable);
 
-    /** The photo bytes alone, without loading the entity and its relations. */
-    @Query("SELECT b.customPhoto FROM Boulder b WHERE b.id = :id")
-    public Optional<byte[]> findCustomPhotoById(UUID id);
+    /**
+     * Bulk delete, outside the persistence context: em.remove() fails at
+     * flush with Hibernate 7 because the loaded BoulderScore (a view mapped
+     * as an entity) still references the removed boulder
+     * (TransientPropertyValueException). Nothing is cascaded either way;
+     * obsolete votes go with ON DELETE CASCADE.
+     */
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM Boulder b WHERE b.id = :id")
+    public int deleteBoulder(UUID id);
 
     /** @return 1 if the vote was recorded, 0 if this user had already voted. */
     @Modifying

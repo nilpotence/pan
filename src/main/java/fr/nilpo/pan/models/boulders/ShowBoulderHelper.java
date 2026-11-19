@@ -28,9 +28,9 @@ public class ShowBoulderHelper {
 			}
 			
 			minX = Math.max(0, minX - 100);
-			maxX = Math.min(b.getCustomPhotoWidth(), maxX + 100);
+			maxX = Math.min(b.getPhoto().getWidth(), maxX + 100);
 			minY = Math.max(0, minY - 100);
-			maxY = Math.min(b.getCustomPhotoHeight(), maxY + 100);
+			maxY = Math.min(b.getPhoto().getHeight(), maxY + 100);
 			
 			double width = maxX - minX;
 			double height = maxY - minY;

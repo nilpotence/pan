@@ -1,10 +1,7 @@
 package fr.nilpo.pan.controllers;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -17,10 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.SortDefault;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,14 +27,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import fr.nilpo.pan.config.AuthService;
 import fr.nilpo.pan.models.boulders.Boulder;
 import fr.nilpo.pan.models.boulders.BoulderIndexData;
 import fr.nilpo.pan.models.boulders.BoulderRepository;
-import fr.nilpo.pan.models.boulders.DefaultPhoto;
 import fr.nilpo.pan.models.boulders.DefaultPhotoRepository;
+import fr.nilpo.pan.models.boulders.Photo;
+import fr.nilpo.pan.models.boulders.PhotoService;
 import fr.nilpo.pan.models.boulders.ShowBoulderHelper;
 import fr.nilpo.pan.models.boulders.Tick;
 import fr.nilpo.pan.models.boulders.TickRepository;
@@ -60,6 +56,9 @@ public class BoulderController {
 	
 	@Autowired
 	private TickRepository tickRepository;
+	
+	@Autowired
+	private PhotoService photoService;
 
 	private static final Pattern GRADE = Pattern.compile("^[3-8][a-c]\\+{0,1}$");
 	static final int MAX_TICK_COMMENT_LENGTH = 1000;
@@ -76,32 +75,45 @@ public class BoulderController {
 	}
 
 	/**
-	 * Only user-editable fields are bound onto a submitted Boulder. In
-	 * particular the photo dimensions are always derived from the decoded
-	 * image (setCustomPhoto), never taken from the request.
+	 * Only user-editable fields are bound onto a submitted Boulder. The photo
+	 * comes separately (photoId / customPhoto, see resolvePhoto).
 	 */
 	@InitBinder("boulder")
 	public void initBoulderBinder(WebDataBinder binder) {
-		binder.setAllowedFields("name", "comment", "estimatedGrade", "customPhoto", "holds");
+		binder.setAllowedFields("name", "comment", "estimatedGrade", "holds");
 	}
 
 	/**
-	 * Photo shown behind the holds canvas when a submitted form is
-	 * re-rendered with errors: the submitted photo if it was valid, else the
-	 * latest default photo.
+	 * The photo of a submitted boulder form: a new photo taken by the user
+	 * (customPhoto, a data URL), else the photo the form was showing
+	 * (photoId: the default photo, or the boulder's current photo when
+	 * editing). Only a new photo is uploaded; it is stored deduplicated.
+	 *
+	 * @return null, with an error on the "photo" field, if neither is valid
 	 */
-	private DefaultPhoto formPhoto(byte[] rawPhoto, int width, int height) {
-		if (rawPhoto == null) {
-			return defaultPhotoRepository
-					.findFirstByOrderByCreatedAtDesc()
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+	private Photo resolvePhoto(String photoId, String customPhoto, BindingResult bindingResult) {
+		if (customPhoto != null && !customPhoto.isBlank()) {
+			try {
+				return photoService.save(customPhoto);
+			} catch (IllegalArgumentException e) {
+				bindingResult.rejectValue("photo", "invalid", "Cette photo n'est pas valide, veuillez en prendre une autre !");
+				return null;
+			}
 		}
+		
+		var photo = photoService.find(photoId);
+		if (photo.isEmpty()) {
+			bindingResult.rejectValue("photo", "missing", "Vous devez choisir une photo pour votre bloc !");
+			return null;
+		}
+		return photo.get();
+	}
 
-		var photo = new DefaultPhoto();
-		photo.setWidth(width);
-		photo.setHeight(height);
-		photo.setRawData(rawPhoto);
-		return photo;
+	private Photo latestDefaultPhoto() {
+		return defaultPhotoRepository
+				.findFirstByOrderByCreatedAtDesc()
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR))
+				.getPhoto();
 	}
 	
 	@GetMapping("/boulders")
@@ -150,14 +162,7 @@ public class BoulderController {
 		
 		var bbox = ShowBoulderHelper.getBoulderBoundingBox(b);
 		
-		// Every edit sets lastUpdatedAt: a new photo gets a new URL, so the
-		// photo itself can be cached for good (see photo()).
-		var photoVersion = Objects
-				.requireNonNullElse(b.getLastUpdatedAt(), b.getCreatedAt())
-				.toEpochSecond(ZoneOffset.UTC);
-		
 		model.addAttribute("boulder", b);
-		model.addAttribute("photoUrl", "/boulders/" + b.getId() + "/photo?v=" + photoVersion);
 		model.addAttribute("ticks", ticks);
 		model.addAttribute("bbox", bbox);
         model.addAttribute("gradeStatsCount", gradeStatsCount);
@@ -165,24 +170,6 @@ public class BoulderController {
 		
 		
 		return "boulders/show";
-	}
-	
-	/**
-	 * The photo as a separate, cacheable resource instead of a base64 data
-	 * URL inlined in the (uncacheable) show page. Its URL carries a version
-	 * (?v=, see show()), so it never changes and can be cached forever.
-	 * Photos are always re-encoded as JPEG on upload (ImageHelper).
-	 */
-	@GetMapping("/boulders/{id}/photo")
-	public ResponseEntity<byte[]> photo(@PathVariable("id") UUID id) {
-		var photo = boulderRepository
-				.findCustomPhotoById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-		
-		return ResponseEntity.ok()
-				.contentType(MediaType.IMAGE_JPEG)
-				.cacheControl(CacheControl.maxAge(365, TimeUnit.DAYS).cachePublic().immutable())
-				.body(photo);
 	}
 	
 	@PutMapping("/boulders/{id}/obsolete")
@@ -223,7 +210,8 @@ public class BoulderController {
 	public String delete(@PathVariable("id") UUID id) {
 		var boulder = findUpdatable(id);
 		
-		boulderRepository.delete(boulder);
+		boulderRepository.deleteBoulder(boulder.getId());
+		photoService.deleteIfUnused(boulder.getPhoto());
 		
 		return "redirect:/boulders";
 	}
@@ -231,14 +219,8 @@ public class BoulderController {
 	@GetMapping(path = "/boulders/{id}/edit")
 	public String editForm(@PathVariable("id") UUID id, Model model) {
 		var boulder = findUpdatable(id);
-
-		var defaultPhoto = new DefaultPhoto();
-
-		defaultPhoto.setWidth(boulder.getCustomPhotoWidth());
-		defaultPhoto.setHeight(boulder.getCustomPhotoHeight());
-		defaultPhoto.setRawData(boulder.getRawCustomPhoto());
 		
-		model.addAttribute("defaultPhoto", defaultPhoto);
+		model.addAttribute("formPhoto", boulder.getPhoto());
 		model.addAttribute("boulder", boulder);
 		
 		return "boulders/edit";
@@ -250,47 +232,45 @@ public class BoulderController {
 			@PathVariable("id") UUID id, 
 			@ModelAttribute("boulder") @Valid Boulder updatedBoulder,
 			BindingResult results,
+			@RequestParam(name = "photoId", required = false) String photoId,
+			@RequestParam(name = "customPhoto", required = false) String customPhoto,
 			Model model) {
 		
 		// Authorization first: a non-owner must not get the edit form back
-		// just by submitting invalid data.
+		// (nor upload a photo) just by submitting invalid data.
 		var boulder = findUpdatable(id);
 		
+		var photo = resolvePhoto(photoId, customPhoto, results);
+		
 		if (results.hasErrors()) {
-			var defaultPhoto = new DefaultPhoto();
-
-			defaultPhoto.setWidth(boulder.getCustomPhotoWidth());
-			defaultPhoto.setHeight(boulder.getCustomPhotoHeight());
-			defaultPhoto.setRawData(boulder.getRawCustomPhoto());
-			
-			model.addAttribute("defaultPhoto", defaultPhoto);
+			model.addAttribute("formPhoto", photo != null ? photo : boulder.getPhoto());
 			
 			return "boulders/edit";
 		}
+		
+		var previousPhoto = boulder.getPhoto();
 		
 		boulder.setName(updatedBoulder.getName());
 		boulder.setEstimatedGrade(updatedBoulder.getEstimatedGrade());
 		boulder.setComment(updatedBoulder.getComment());
 		boulder.setHolds(updatedBoulder.getHolds());
-		boulder.setRawCustomPhoto(updatedBoulder.getRawCustomPhoto());
-		boulder.setCustomPhotoWidth(updatedBoulder.getCustomPhotoWidth());
-		boulder.setCustomPhotoHeight(updatedBoulder.getCustomPhotoHeight());
+		boulder.setPhoto(photo);
 		
 		boulder.setLastUpdatedAt(LocalDateTime.now());
 		boulder.setLastUpdatedBy(authService.getCurrentUser());
 		
 		boulderRepository.save(boulder);
 		
+		if (!previousPhoto.getId().equals(photo.getId())) {
+			photoService.deleteIfUnused(previousPhoto);
+		}
+		
 		return "redirect:/boulders/{id}";
 	}
 	
 	@GetMapping("/boulders/new")
 	public String createForm(Model model) {		
-		var defaultPhoto = defaultPhotoRepository
-				.findFirstByOrderByCreatedAtDesc()
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-		
-		model.addAttribute("defaultPhoto", defaultPhoto);
+		model.addAttribute("formPhoto", latestDefaultPhoto());
 		model.addAttribute("boulder", new Boulder());
 		return "boulders/new";
 	}
@@ -300,15 +280,21 @@ public class BoulderController {
 	public String create(
 			@ModelAttribute("boulder") @Valid Boulder boulder,
 			BindingResult bindingResult,
+			@RequestParam(name = "photoId", required = false) String photoId,
+			@RequestParam(name = "customPhoto", required = false) String customPhoto,
 			Model model) {
 		
+		var photo = resolvePhoto(photoId, customPhoto, bindingResult);
+		
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("defaultPhoto",
-					formPhoto(boulder.getRawCustomPhoto(), boulder.getCustomPhotoWidth(), boulder.getCustomPhotoHeight()));
+			// A valid new photo is already stored: shown again by id, so
+			// the form doesn't upload it a second time.
+			model.addAttribute("formPhoto", photo != null ? photo : latestDefaultPhoto());
 			
 			return "boulders/new";
 		}
 		
+		boulder.setPhoto(photo);
 		boulder.setCreatedBy(authService.getCurrentUser());
 		boulder.setCreatedAt(LocalDateTime.now());
 		
