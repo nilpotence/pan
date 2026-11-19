@@ -33,3 +33,5 @@ databaseChangeLog:
       file: classpath*:db/changelog/migrations/0000016_obsolete_vote.sql
   - include:
       file: classpath*:db/changelog/migrations/0000017_photo.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000018_tick_boulder_fk.sql

@@ -1,5 +1,6 @@
 package fr.nilpo.pan.models.users;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
@@ -16,7 +17,11 @@ import lombok.RequiredArgsConstructor;
 @Immutable
 @Getter
 @RequiredArgsConstructor
-public class AppUserScore {
+public class AppUserScore implements Serializable {
+	// Reachable from the logged-in AppUser, which is stored in the HTTP
+	// session (security context): it must be serializable for the session
+	// to be saved, e.g. across devtools restarts.
+	private static final long serialVersionUID = -2364711086425573092L;
 	
 	@Id
 	private UUID appUserId;
