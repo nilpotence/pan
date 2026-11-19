@@ -1,7 +1,8 @@
 package fr.nilpo.pan.controllers;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,7 +62,8 @@ public class AccountController {
 	public String signup(
 			@ModelAttribute("user") @Valid AppUser user, 
 			BindingResult results,
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			HttpServletResponse response) {
 		if (results.hasErrors()) {
 			return "/account/signup";
 		}
@@ -76,13 +78,7 @@ public class AccountController {
 				.findById(user.getId())
 				.orElseThrow(() -> new RuntimeException("Erreur lors de la création de l'utilisateur"));
 		
-		authService.authenticate(user);
-
-		// Manual login bypasses Spring Security's session fixation
-		// protection: rotate the session id ourselves.
-		if (request.getSession(false) != null) {
-			request.changeSessionId();
-		}
+		authService.authenticate(user, request, response);
 		
 		return "redirect:/";
 	}

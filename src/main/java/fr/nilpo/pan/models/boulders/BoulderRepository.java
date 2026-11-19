@@ -20,9 +20,10 @@ public interface BoulderRepository extends JpaRepository<Boulder, UUID>{
 
     @Query(
         "SELECT new fr.nilpo.pan.models.boulders.BoulderIndexData(" +
-            "b.id, b.name, b.estimatedGrade, b.obsoleteCount, b.score.score, t.id IS NOT NULL" +
+            "b.id, b.name, b.estimatedGrade, b.obsoleteCount, b.score.score, " +
+            "CASE WHEN t.boulder IS NOT NULL THEN true ELSE false END" +
         ") FROM Boulder b " +
-        "LEFT JOIN FETCH Tick t ON t.boulder = b AND t.appUser = :user"
+        "LEFT JOIN Tick t ON t.boulder = b AND t.appUser = :user"
     )
     public Page<BoulderIndexData> findAll(AppUser user, Pageable pageable);
 

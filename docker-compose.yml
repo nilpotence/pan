@@ -1,7 +1,6 @@
-version: "3.3"
 services:
   esbuild:
-    image: node:14-alpine
+    image: node:24-alpine
     working_dir: /infoparquet
     tty: true #esbuild --watch does not work if stdin is closed
     user: "1000:1000"
@@ -9,7 +8,7 @@ services:
     volumes:
       - .:/infoparquet
   front:
-    image: nginx:1.23-alpine
+    image: nginx:1.28-alpine
     volumes:
       - "./nginx.conf:/etc/nginx/nginx.conf"
       - "./nginx-selfsigned.crt:/nginx-selfsigned.crt"
@@ -17,7 +16,7 @@ services:
     ports:
       - "8443:8443"
   web:
-    image: maven:3-openjdk-11
+    image: maven:3-eclipse-temurin-17
     working_dir: /infoparquet
     command: mvn -Duser.home=/maven spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:9899"
     user: 1000:1000
@@ -36,7 +35,11 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
   db:
-    image: postgres
+    # Pinned to the major version AND Debian release the local data volume
+    # was created with: an unpinned "postgres" would jump majors (refusing
+    # the old data dir), and a newer Debian/glibc changes text collation
+    # (indexes on text columns would need a REINDEX).
+    image: postgres:16-bookworm
     volumes:
       - data:/var/lib/postgresql/data
     environment:
