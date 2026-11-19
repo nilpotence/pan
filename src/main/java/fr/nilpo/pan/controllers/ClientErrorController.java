@@ -1,10 +1,14 @@
 package fr.nilpo.pan.controllers;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClientErrorController {
 
 	static final int MAX_LOGGED_LENGTH = 1000;
+	static final int MAX_MESSAGES_PER_MINUTE = 60;
+
+	@Autowired
+	private fr.nilpo.pan.config.RateLimiter rateLimiter;
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -21,9 +29,13 @@ public class ClientErrorController {
 	 * are escaped (no forged log lines via CR/LF).
 	 */
 	@GetMapping(path = "/api/errors", produces = "application/json")
-	public String logError(String message) {
+	public ResponseEntity<String> logError(String message, jakarta.servlet.http.HttpServletRequest request) {
 		if (message == null || message.isEmpty()) {
-			return "\"OK\"";
+			return ResponseEntity.ok("\"OK\"");
+		}
+
+		if (!rateLimiter.tryAcquire("client-errors|" + request.getRemoteAddr(), MAX_MESSAGES_PER_MINUTE, Duration.ofMinutes(1))) {
+			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("\"Too many requests\"");
 		}
 
 		String decoded;
@@ -35,7 +47,7 @@ public class ClientErrorController {
 
 		logger.info("client error: {}", sanitize(decoded));
 
-		return "\"OK\"";
+		return ResponseEntity.ok("\"OK\"");
 	}
 
 	static String sanitize(String s) {

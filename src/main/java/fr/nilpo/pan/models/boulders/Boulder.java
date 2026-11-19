@@ -12,6 +12,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import org.hibernate.annotations.Filter;
 
@@ -29,6 +30,7 @@ public class Boulder extends PanEntity {
 	private static final long serialVersionUID = 7218997923315836091L;
 
 	@NotBlank(message = "Vous devez choisir un nom pour votre bloc !")
+	@Size(max = 100, message = "Le nom du bloc ne doit pas dépasser 100 caractères !")
 	private String name;
 	
 	@NotNull(message = "Vous devez choisir une cotation pour votre bloc !")
@@ -49,6 +51,7 @@ public class Boulder extends PanEntity {
 	private int customPhotoHeight = 0;
 	
 	@Column(nullable = true)
+	@Size(max = 1000, message = "Le commentaire ne doit pas dépasser 1000 caractères !")
 	private String comment;
 	
 	@Column(nullable = false)

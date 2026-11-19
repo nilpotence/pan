@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 
@@ -28,6 +30,9 @@ public class SecurityConfig {
 	
 	@Autowired
 	private UserDetailsService usersDetailsService;
+	
+	@Autowired
+	private LoginThrottle loginThrottle;
 	
 	@Bean
 	public SecurityContextRepository securityContextRepository() {
@@ -58,9 +63,25 @@ public class SecurityConfig {
 					.anyRequest()
 					.authenticated()
 			)
+			.addFilterBefore(new LoginThrottle.Filter(loginThrottle), UsernamePasswordAuthenticationFilter.class)
 			.formLogin(form -> form
 					.loginPage("/signin")
 					.permitAll()
+					.failureHandler((request, response, exception) -> {
+						loginThrottle.onFailure(request);
+						response.sendRedirect(request.getContextPath() + "/signin?error");
+					})
+					.successHandler(new SavedRequestAwareAuthenticationSuccessHandler() {
+						@Override
+						public void onAuthenticationSuccess(
+								jakarta.servlet.http.HttpServletRequest request,
+								jakarta.servlet.http.HttpServletResponse response,
+								org.springframework.security.core.Authentication authentication)
+								throws java.io.IOException, jakarta.servlet.ServletException {
+							loginThrottle.onSuccess(request);
+							super.onAuthenticationSuccess(request, response, authentication);
+						}
+					})
 			)
 			.logout(logout -> logout
 					.logoutUrl("/signout")
