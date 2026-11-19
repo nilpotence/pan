@@ -6,13 +6,10 @@
  	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<#-- No favicon: without this the browser asks for /favicon.ico on every page, which redirects to /signin (2 requests + a page render). -->
+		<link rel="icon" href="data:,">
 		<link rel="stylesheet" type="text/css" media="all" href="<@spring.url '/bundle/index.css' />" />
-		<link rel="stylesheet" href="/icons/css/trash.css" />
-		<link rel="stylesheet" href="/icons/css/pen.css" />
-		<link rel="stylesheet" href="/icons/css/arrow-left.css" />
-		<link rel="stylesheet" href="/icons/css/arrow-right.css" />
-		<link rel="stylesheet" href="/icons/css/danger.css" />
-		<script type="application/javascript" src="<@spring.url '/bundle/index.js' />"></script>
+		<script defer src="<@spring.url '/bundle/index.js' />"></script>
 		<title>${title}</title>
 	</head>
 	<body>

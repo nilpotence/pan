@@ -1,7 +1,10 @@
 package fr.nilpo.pan.controllers;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -14,7 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.SortDefault;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -144,7 +150,14 @@ public class BoulderController {
 		
 		var bbox = ShowBoulderHelper.getBoulderBoundingBox(b);
 		
+		// Every edit sets lastUpdatedAt: a new photo gets a new URL, so the
+		// photo itself can be cached for good (see photo()).
+		var photoVersion = Objects
+				.requireNonNullElse(b.getLastUpdatedAt(), b.getCreatedAt())
+				.toEpochSecond(ZoneOffset.UTC);
+		
 		model.addAttribute("boulder", b);
+		model.addAttribute("photoUrl", "/boulders/" + b.getId() + "/photo?v=" + photoVersion);
 		model.addAttribute("ticks", ticks);
 		model.addAttribute("bbox", bbox);
         model.addAttribute("gradeStatsCount", gradeStatsCount);
@@ -152,6 +165,24 @@ public class BoulderController {
 		
 		
 		return "boulders/show";
+	}
+	
+	/**
+	 * The photo as a separate, cacheable resource instead of a base64 data
+	 * URL inlined in the (uncacheable) show page. Its URL carries a version
+	 * (?v=, see show()), so it never changes and can be cached forever.
+	 * Photos are always re-encoded as JPEG on upload (ImageHelper).
+	 */
+	@GetMapping("/boulders/{id}/photo")
+	public ResponseEntity<byte[]> photo(@PathVariable("id") UUID id) {
+		var photo = boulderRepository
+				.findCustomPhotoById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		
+		return ResponseEntity.ok()
+				.contentType(MediaType.IMAGE_JPEG)
+				.cacheControl(CacheControl.maxAge(365, TimeUnit.DAYS).cachePublic().immutable())
+				.body(photo);
 	}
 	
 	@PutMapping("/boulders/{id}/obsolete")

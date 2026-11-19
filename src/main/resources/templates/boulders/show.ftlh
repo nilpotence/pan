@@ -54,7 +54,7 @@
 		<#-- Photo drawn once, reused below: dimmed everywhere, full brightness inside the holds clip path. -->
 		<image
 			id="boulderPhoto"
-			xlink:href="${boulder.customPhoto}"
+			xlink:href="${photoUrl}"
 			x="0"
 			y="0"
 			width="${boulder.customPhotoWidth?c}"
@@ -224,5 +224,5 @@
 		</dialog>
 	</#if>
 	
-	<script type="text/javascript" src="/bundle/boulders/show.js"></script>
+	<script src="<@spring.url '/bundle/boulders/show.js' />"></script>
 </@layout.main>

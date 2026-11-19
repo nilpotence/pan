@@ -15,5 +15,5 @@
 		<button id="photoSubmitBtn" type="submit">Ajouter</button>
 	</@f.form>
 	
-	<script type="text/javascript" src="/bundle/boulders/defaultphotos/new.js"></script>
+	<script src="<@spring.url '/bundle/boulders/defaultphotos/new.js' />"></script>
 </@layout.main>

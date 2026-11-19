@@ -1,5 +1,6 @@
 package fr.nilpo.pan.models.boulders;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -26,6 +27,10 @@ public interface BoulderRepository extends JpaRepository<Boulder, UUID>{
         "LEFT JOIN Tick t ON t.boulder = b AND t.appUser = :user"
     )
     public Page<BoulderIndexData> findAll(AppUser user, Pageable pageable);
+
+    /** The photo bytes alone, without loading the entity and its relations. */
+    @Query("SELECT b.customPhoto FROM Boulder b WHERE b.id = :id")
+    public Optional<byte[]> findCustomPhotoById(UUID id);
 
     /** @return 1 if the vote was recorded, 0 if this user had already voted. */
     @Modifying

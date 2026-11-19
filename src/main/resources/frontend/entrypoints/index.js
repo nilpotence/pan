@@ -1,15 +1,15 @@
 //import * as Turbo from "@hotwired/turbo"
 
-import 'dialog-polyfill/dist/dialog-polyfill.css'
 import '@picocss/pico'
+// Only the icons the templates use, bundled instead of one <link> each.
+import 'css.gg/icons/css/trash.css'
+import 'css.gg/icons/css/pen.css'
+import 'css.gg/icons/css/arrow-left.css'
+import 'css.gg/icons/css/arrow-right.css'
 import "./index.css"
 
 import ready from "../components/ready.js"
 import logError from "../components/send_client_error.js"
-
-import dialogPolyfill from 'dialog-polyfill'
-
-window.dialogPolyfill = dialogPolyfill
 
 window.onerror = function (message, url, lineNumber) {
 	logError("[url="+url+", line="+lineNumber+"] " + message)
@@ -29,8 +29,6 @@ ready(() => {
 	
 	if (!userDialog) return 
 	
-	dialogPolyfill.registerDialog(userDialog)
-
 	const userDialogOpenBtn = document.querySelector("#userDialogOpenBtn")
 	const userDialogBackBtn = userDialog.querySelector("#userDialogBackBtn")
 	const logoutBtn = userDialog.querySelector("#logoutBtn")

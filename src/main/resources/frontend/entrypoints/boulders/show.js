@@ -1,5 +1,4 @@
 import ready from '../../components/ready'
-import logError from '../../components/send_client_error'
 
 ready(() => {
 	class DeleteDialog {
@@ -7,9 +6,7 @@ ready(() => {
 			this.dialog = document.querySelector('#confirmDeleteDialog')
 			
 			if (!this.dialog) return 
-			
-			dialogPolyfill.registerDialog(this.dialog)
-			
+						
 			this.deleteForm = this.dialog.querySelector("#deleteForm")
 			
 			this.cancelAction = this.dialog.querySelector("#cancelDeleteAction")	
@@ -39,8 +36,6 @@ ready(() => {
 			this.dialog = document.querySelector("#tickDialog")
 			
 			if (!this.dialog) return
-
-			dialogPolyfill.registerDialog(this.dialog)
 		
 			this.tickForm = this.dialog.querySelector("form#tick")
 
@@ -71,8 +66,6 @@ ready(() => {
 			this.dialog = document.querySelector("#obsoleteDialog")
 		 
 			if (!this.dialog) return;
-
-			dialogPolyfill.registerDialog(this.dialog)
 		
 			this.obsoleteForm = this.dialog.querySelector("form#obsoleteForm")
 			this.cancelAction = this.dialog.querySelector("#cancelObsoleteAction")
@@ -114,9 +107,7 @@ ready(() => {
 	const obsoleteDialog = new ObsoleteDialog()
 
 	document.querySelectorAll(".obsolete-boulder-action").forEach(elem => {
-		logError("found one obsolete boulder action")
 		elem.addEventListener('click', () => {
-			logError("Clicked obsolete boulder action")
 			obsoleteDialog.open(elem)
 		})
 	})
@@ -125,9 +116,7 @@ ready(() => {
 	const deleteDialog = new DeleteDialog()
 
 	document.querySelectorAll('.delete-boulder-action').forEach(elem => {
-		logError("found one delete boulder action")
 		elem.addEventListener('click', () => {
-			logError("clicked delete action")
 			deleteDialog.open(elem)
 		})
 	})
@@ -135,13 +124,10 @@ ready(() => {
 	const tickDialog = new TickDialog()
 
 	document.querySelectorAll('.edit-tick-action').forEach(elem => {
-		logError("found one edit tick action")
 		elem.addEventListener('click', evt => {
-			logError("clicked tick action")
 			tickDialog.open()
 		})
 	})
 	
-	logError("dialog init complete !")
 })
 

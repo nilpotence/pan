@@ -78,7 +78,7 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers("/boulders/new", "/boulders/*/edit")
 					.authenticated()
-					.requestMatchers(HttpMethod.GET, "/", "/boulders", "/boulders/**","/api/errors", "/img/**", "/bundle/**", "/icons/**")
+					.requestMatchers(HttpMethod.GET, "/", "/boulders", "/boulders/**","/api/errors", "/img/**", "/bundle/**")
 					.permitAll()
 					.requestMatchers("/signin", "/signup")
 					.permitAll()
