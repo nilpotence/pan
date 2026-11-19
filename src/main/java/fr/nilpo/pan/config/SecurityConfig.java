@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 import jakarta.servlet.DispatcherType;
 
@@ -34,6 +35,23 @@ public class SecurityConfig {
 	@Autowired
 	private LoginThrottle loginThrottle;
 	
+	/**
+	 * No inline or third-party scripts: an injected <script> or event
+	 * handler would not run. Inline style attributes are still used by the
+	 * templates; photos are data: URLs and the photo picker previews a blob:.
+	 */
+	static final String CONTENT_SECURITY_POLICY = String.join("; ",
+			"default-src 'self'",
+			"script-src 'self'",
+			"style-src 'self' 'unsafe-inline'",
+			"img-src 'self' data: blob:",
+			"font-src 'self' data:",
+			"connect-src 'self'",
+			"object-src 'none'",
+			"base-uri 'self'",
+			"form-action 'self'",
+			"frame-ancestors 'none'");
+	
 	@Bean
 	public SecurityContextRepository securityContextRepository() {
 		return new HttpSessionSecurityContextRepository();
@@ -42,6 +60,10 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, SecurityContextRepository securityContextRepository) throws Exception {
 		http
+			.headers(headers -> headers
+					.contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
+					.referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.SAME_ORIGIN))
+			)
 			.securityContext(securityContext -> securityContext
 					.securityContextRepository(securityContextRepository)
 			)

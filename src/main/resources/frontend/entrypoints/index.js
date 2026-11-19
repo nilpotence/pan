@@ -15,6 +15,15 @@ window.onerror = function (message, url, lineNumber) {
 	logError("[url="+url+", line="+lineNumber+"] " + message)
 }
 
+// Boulder list sort selector (kept out of the template: no inline scripts under the CSP)
+ready(() => {
+	const sortSelect = document.querySelector("#sortSelect")
+	
+	if (!sortSelect) return
+	
+	sortSelect.addEventListener('change', evt => window.location = "?sort=" + evt.target.value)
+})
+
 ready(() => {
 	const userDialog = document.querySelector("#userDialog")
 	

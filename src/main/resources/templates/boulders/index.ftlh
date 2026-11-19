@@ -60,9 +60,4 @@
 	</table>
 	
 	<@t.pagination boulders />
-	
-	<script type="text/javascript">
-		const select = document.querySelector("#sortSelect")
-		select.addEventListener('change', evt => window.location = "?sort=" + evt.target.value)
-	</script>
 </@layout.main>
