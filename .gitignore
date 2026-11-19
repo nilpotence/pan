@@ -34,7 +34,8 @@ build/
 .vscode/
 
 ### maven ###
-maven*
+# local Maven repository used by the docker compose "web" service
+/maven/
 *.m2/*
 
 ### yarn ###
