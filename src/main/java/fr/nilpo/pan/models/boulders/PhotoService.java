@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -24,16 +25,47 @@ public class PhotoService {
 	private PhotoRepository photoRepository;
 
 	/**
+	 * Decoding a photo allocates tens of MB, up to ~200 MB for a PNG with
+	 * alpha at the pixel limit, from an upload of a few KB: without a cap,
+	 * a handful of concurrent uploads could exhaust the heap.
+	 */
+	static final int MAX_CONCURRENT_DECODES = 2;
+	private final Semaphore decoding = new Semaphore(MAX_CONCURRENT_DECODES);
+
+	/** Too many photos are being processed right now: try again in a moment. */
+	public static class BusyException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		BusyException() {
+			super("Too many photos being processed");
+		}
+	}
+
+	/**
 	 * Decodes, validates and re-encodes an uploaded photo (see ImageHelper),
 	 * then stores it unless an identical one already exists.
 	 *
-	 * @throws IllegalArgumentException if the data URL isn't a valid image.
-	 *         Thrown before anything is written, and callers turn it into a
-	 *         form error: it must not mark their transaction rollback-only.
+	 * Doesn't wait for a decoding slot: callers run inside a transaction, so
+	 * waiting would hold a database connection, and a burst of uploads would
+	 * exhaust the pool.
+	 *
+	 * Both exceptions below are thrown before anything is written, and
+	 * callers turn them into a form error: they must not mark their
+	 * transaction rollback-only.
+	 *
+	 * @throws IllegalArgumentException if the data URL isn't a valid image
+	 * @throws BusyException if {@link #MAX_CONCURRENT_DECODES} photos are
+	 *         already being decoded
 	 */
-	@Transactional(noRollbackFor = IllegalArgumentException.class)
+	@Transactional(noRollbackFor = { IllegalArgumentException.class, BusyException.class })
 	public Photo save(String dataUrl) {
-		var image = ImageHelper.parseDataUrl(dataUrl);
+		if (!decoding.tryAcquire()) throw new BusyException();
+		ImageHelper.ImageDetails image;
+		try {
+			image = ImageHelper.parseDataUrl(dataUrl);
+		} finally {
+			decoding.release();
+		}
 		var id = sha256(image.getData());
 
 		photoRepository.insertIfAbsent(id, image.getData(), image.getWidth(), image.getHeight());

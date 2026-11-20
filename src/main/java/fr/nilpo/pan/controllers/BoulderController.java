@@ -98,6 +98,9 @@ public class BoulderController {
 			} catch (IllegalArgumentException e) {
 				bindingResult.rejectValue("photo", "invalid", "Cette photo n'est pas valide, veuillez en prendre une autre !");
 				return null;
+			} catch (PhotoService.BusyException e) {
+				bindingResult.rejectValue("photo", "busy", "Le serveur traite déjà d'autres photos, veuillez réessayer dans un instant !");
+				return null;
 			}
 		}
 		

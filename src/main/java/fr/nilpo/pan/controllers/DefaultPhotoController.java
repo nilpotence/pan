@@ -91,6 +91,8 @@ public class DefaultPhotoController {
 			photo.setPhoto(photoService.save(data));
 		} catch (IllegalArgumentException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid photo");
+		} catch (PhotoService.BusyException e) {
+			throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Too many photos being processed");
 		}
 		photo.setCreatedBy(authService.getCurrentUser());
 		photo.setCreatedAt(LocalDateTime.now());

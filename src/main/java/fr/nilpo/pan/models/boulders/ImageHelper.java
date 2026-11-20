@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
+import javax.imageio.stream.MemoryCacheImageInputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +22,15 @@ import lombok.RequiredArgsConstructor;
 public class ImageHelper {
 
 	// The browser resizes every photo to 1600px wide before upload
-	// (take_photo.js), so a tall portrait shot is about 1600x2850. Anything
-	// beyond these limits is rejected from the header alone, before the
-	// pixels are decoded, so a small file declaring huge dimensions
-	// (decompression bomb) can't make us allocate gigabytes.
+	// (take_photo.js), so a tall portrait shot is about 1600x2850 (4.6 Mpx).
+	// Anything beyond these limits is rejected from the header alone, before
+	// the pixels are decoded, so a small file declaring huge dimensions
+	// (decompression bomb) can't make us allocate gigabytes. Even within
+	// them, decoding a photo allocates tens of MB (more for a PNG with
+	// alpha): PhotoService also limits how many are decoded at once.
 	static final int MAX_DATA_URL_LENGTH = 2_000_000;
 	static final int MAX_SIDE = 4000;
-	static final long MAX_PIXELS = 8_000_000L;
+	static final long MAX_PIXELS = 5_000_000L;
 
 	private static final Pattern DATA_URL_PREFIX = Pattern.compile("^data:image/(jpeg|png);base64,");
 	private static final Set<String> ALLOWED_FORMATS = Set.of("jpeg", "png");
@@ -48,10 +52,9 @@ public class ImageHelper {
 			throw new IllegalArgumentException("Invalid base64 image data", e);
 		}
 
-		try (var input = ImageIO.createImageInputStream(new ByteArrayInputStream(rawData))) {
-			if (input == null) {
-				throw new IllegalArgumentException("Not a recognized image");
-			}
+		// In memory: ImageIO.createImageInputStream would copy the whole
+		// upload to a temporary file first (ImageIO's disk cache).
+		try (var input = new MemoryCacheImageInputStream(new ByteArrayInputStream(rawData))) {
 			var readers = ImageIO.getImageReaders(input);
 			if (!readers.hasNext()) {
 				throw new IllegalArgumentException("Not a recognized image");
@@ -97,19 +100,27 @@ public class ImageHelper {
 		return rgb;
 	}
 
+	/**
+	 * The stream is in memory (ImageIO.createImageOutputStream would back it
+	 * with a temporary file) and closed, and the writer disposed, even on
+	 * failure: otherwise the file, its descriptor and the writer's native
+	 * state are only released by a later GC.
+	 */
 	private static byte[] saveImage(BufferedImage image) throws IOException {
 		var outputData = new ByteArrayOutputStream();
+		var writer = ImageIO.getImageWritersByFormatName("jpg").next();
+		try (var output = new MemoryCacheImageOutputStream(outputData)) {
+			writer.setOutput(output);
 
-		var writers = ImageIO.getImageWritersByFormatName("jpg");
-		var writer = writers.next();
-		writer.setOutput(ImageIO.createImageOutputStream(outputData));
-		
-		var params = writer.getDefaultWriteParam();
-		params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-		params.setCompressionQuality(0.5f);
-		
-		writer.write(null, new IIOImage(image, null, null), params);
-		
+			var params = writer.getDefaultWriteParam();
+			params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+			params.setCompressionQuality(0.5f);
+
+			writer.write(null, new IIOImage(image, null, null), params);
+		} finally {
+			writer.dispose();
+		}
+		// Only after close(), which flushes what is still cached to outputData.
 		return outputData.toByteArray();
 	}
 	
