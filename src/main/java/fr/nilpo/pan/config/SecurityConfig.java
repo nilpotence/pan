@@ -83,12 +83,14 @@ public class SecurityConfig {
 					.securityContextRepository(securityContextRepository)
 			)
 			// No session for anonymous visitors until one is needed (CSRF
-			// token of a form, saved request before /signin).
+			// token of a form, saved request before /signin). Sessions are
+			// stored in PostgreSQL; their lifetime and number per user are
+			// bounded by SessionPolicyFilter.
 			// Caveat: the session cookie must be sent before the response is
 			// committed (~8 KB of output). An anonymous page must not render
-			// a form (<@f.csrf />) after a large amount of HTML, or Tomcat
-			// fails with "Cannot create a session after the response has
-			// been committed". Logged-in users already have a session, so
+			// a form (<@f.csrf />) after a large amount of HTML, or Spring
+			// Session fails with "Cannot create a session after the response
+			// has been committed". Logged-in users already have a session, so
 			// only anonymous pages with forms matter (today /signin and
 			// /signup, both small).
 			.sessionManagement(sessionManagement -> sessionManagement

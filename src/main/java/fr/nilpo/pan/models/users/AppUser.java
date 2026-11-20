@@ -1,6 +1,5 @@
 package fr.nilpo.pan.models.users;
 
-import java.util.Collection;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -16,24 +15,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Not stored in the session: the session only holds a PanUserDetails, and the
+ * entity is reloaded from the database (AuthService.getCurrentUser).
+ */
 @Entity
 @Getter
 @Setter
 @RequiredArgsConstructor
 @PasswordMatch
-public class AppUser implements UserDetails {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6603294895853673752L;
+public class AppUser {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -64,29 +59,4 @@ public class AppUser implements UserDetails {
 	
 	@OneToOne(optional = false, mappedBy = "user")
 	private AppUserScore score;
-	
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return AuthorityUtils.createAuthorityList("ROLE_" + getRole().name());
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
 }

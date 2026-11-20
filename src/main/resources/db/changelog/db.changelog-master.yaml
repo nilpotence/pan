@@ -35,3 +35,5 @@ databaseChangeLog:
       file: classpath*:db/changelog/migrations/0000017_photo.sql
   - include:
       file: classpath*:db/changelog/migrations/0000018_tick_boulder_fk.sql
+  - include:
+      file: classpath*:db/changelog/migrations/0000019_spring_session.sql

@@ -16,6 +16,7 @@ public class AppUserService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		return userRepository
 				.findByUsername(username)
+				.map(PanUserDetails::withPassword)
 				.orElseThrow(() -> new UsernameNotFoundException(username));
 	}
 
