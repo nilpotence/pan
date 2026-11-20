@@ -29,50 +29,66 @@
 	
 	
     <p style="font-size: 0.9em; margin-bottom: 0.1em; text-align: right;">Ouvreur : ${boulder.createdBy.username}</p>
-	<svg 
-		viewBox="${bbox.x?floor?c} ${bbox.y?floor?c} ${bbox.width?floor?c} ${bbox.height?floor?c}"
+	<#assign bx = bbox.x?floor />
+	<#assign by = bbox.y?floor />
+	<#assign bw = bbox.width?floor />
+	<#assign bh = bbox.height?floor />
+	<#-- The photo is a plain <img> (composited on the GPU) cropped to the holds bounding box,
+	     with a vector-only SVG on top. Drawing the photo inside the SVG made pinch-zoom/pan
+	     janky on Firefox mobile, which re-rasterises SVG images and clip paths on every tile. -->
+	<div
 		style="
+			position: relative;
 			width: 100%;
-			aspect-ratio: ${bbox.width?floor?c}/${bbox.height?floor?c};
+			aspect-ratio: ${bw?c}/${bh?c};
+			overflow: hidden;
 			user-select: none;
 			border: 1px solid var(--form-element-border-color);
 			border-radius: var(--border-radius);"
 	>
-			
-		<defs>
-			<g id="hold">
-				<circle x=0 y=0 r=10 fill=none stroke-width=1 stroke=red></circle>
-			</g>
-			<circle id="holdClipPath" x=0 y=0 r=30></circle>
-		</defs>
-
-		<clipPath id="holdsClipPath">
+		<img
+			src="/photos/${boulder.photo.id}"
+			alt=""
+			draggable="false"
+			style="
+				position: absolute;
+				max-width: none;
+				left: ${(-bx / bw * 100)?c}%;
+				top: ${(-by / bh * 100)?c}%;
+				width: ${(boulder.photo.width / bw * 100)?c}%;
+				height: ${(boulder.photo.height / bh * 100)?c}%;"
+		/>
+		<svg
+			viewBox="${bx?c} ${by?c} ${bw?c} ${bh?c}"
+			preserveAspectRatio="none"
+			style="position: absolute; inset: 0; width: 100%; height: 100%;"
+		>
+			<defs>
+				<g id="hold">
+					<circle x=0 y=0 r=10 fill=none stroke-width=1 stroke=red></circle>
+				</g>
+				<#-- Veil mask: visible everywhere except around the holds. -->
+				<mask id="holdsMask" maskUnits="userSpaceOnUse" x="${bx?c}" y="${by?c}" width="${bw?c}" height="${bh?c}">
+					<rect x="${bx?c}" y="${by?c}" width="${bw?c}" height="${bh?c}" fill="white" />
+					<#list bbox.holds as h>
+						<circle cx=${h.x?c} cy=${h.y?c} r=30 fill="black"></circle>
+					</#list>
+				</mask>
+			</defs>
+			<rect
+				x="${bx?c}"
+				y="${by?c}"
+				width="${bw?c}"
+				height="${bh?c}"
+				fill="black"
+				fill-opacity="0.5"
+				mask="url(#holdsMask)"
+			/>
 			<#list bbox.holds as h>
-				<use  xlink:href="#holdClipPath" x=${h.x?c} y=${h.y?c}></use>
+				<use class="hold" xlink:href="#hold" x=${h.x?c} y=${h.y?c}></use>
 			</#list>
-		</clipPath>
-		<#-- Photo drawn once, reused below: dimmed everywhere, full brightness inside the holds clip path. -->
-		<image
-			id="boulderPhoto"
-			xlink:href="/photos/${boulder.photo.id}"
-			x="0"
-			y="0"
-			width="${boulder.photo.width?c}"
-			height="${boulder.photo.height?c}"
-		/>
-		<rect
-			x="0"
-			y="0"
-			width="${boulder.photo.width?c}"
-			height="${boulder.photo.height?c}"
-			fill="black"
-			fill-opacity="0.5"
-		/>
-		<use xlink:href="#boulderPhoto" clip-path="url(#holdsClipPath)" />
-		<#list bbox.holds as h>
-			<use class="hold" xlink:href="#hold" x=${h.x?c} y=${h.y?c}></use>
-		</#list>
-	</svg>	
+		</svg>
+	</div>	
 	
 	<#if currentUser??>
 		<p style="font-size: 0.9em; text-align: right;">
